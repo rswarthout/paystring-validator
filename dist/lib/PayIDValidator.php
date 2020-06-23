@@ -226,6 +226,9 @@ class PayIDValidator {
 
         $this->checkStatusCode($info['http_code']);
 
+        $headers = $this->parseResponseHeaders($headerStrings); 
+        $this->checkCORSHeaders($headers);
+
         if ($info['http_code'] === 200) {
             $this->checkContentType($info['content_type']);
             $this->checkResponseTime($info['total_time']);
@@ -256,6 +259,149 @@ class PayIDValidator {
             $statusCode,
             $code
         );
+    }
+
+    /**
+     * Method to check for CORS headers
+     */
+    private function checkCORSHeaders(array $headers)
+    {
+        // format the header keys into lowercase
+        $headers = array_change_key_case($headers, CASE_LOWER);
+
+        if (!isset($headers['access-control-allow-origin'])) {
+            $this->setResponseProperty(
+                'Header Check / Access-Control-Allow-Origin',
+                '',
+                self::VALIDATION_CODE_FAIL,
+                'The header could not be located in the response.'
+            );
+        } elseif ($headers['access-control-allow-origin'] != '*') {
+            $this->setResponseProperty(
+                'Header Check / Access-Control-Allow-Origin',
+                $headers['access-control-allow-origin'],
+                self::VALIDATION_CODE_FAIL,
+                'The header has an incorrect value.'
+            );
+        } else {
+            $this->setResponseProperty(
+                'Header Check / Access-Control-Allow-Origin',
+                $headers['access-control-allow-origin'],
+                self::VALIDATION_CODE_PASS
+            );
+        }
+
+        if (!isset($headers['access-control-allow-methods'])) {
+            $this->setResponseProperty(
+                'Header Check / Access-Control-Allow-Methods',
+                '',
+                self::VALIDATION_CODE_FAIL,
+                'The header could not be located in the response.'
+            );
+        } else {
+
+            $methods = [
+                'POST', 
+                'GET', 
+                'OPTIONS',
+            ];
+
+            $methodValues = explode(',', $headers['access-control-allow-methods']);
+            $methodValues = array_map('trim', $methodValues);
+            $methodErrors = [];
+            
+            foreach ($methods as $method) {
+                if (!in_array($method, $methodValues)) {
+                    $methodErrors[] = 'Method [' . $method . '] not supported.';
+                }
+            }
+
+            if (count($methodErrors)) {
+                $this->setResponseProperty(
+                    'Header Check / Access-Control-Allow-Methods',
+                    $headers['access-control-allow-methods'],
+                    self::VALIDATION_CODE_FAIL,
+                    implode(' ', $methodErrors)
+                );
+            } else {
+                $this->setResponseProperty(
+                    'Header Check / Access-Control-Allow-Methods',
+                    $headers['access-control-allow-methods'],
+                    self::VALIDATION_CODE_PASS
+                );
+            }
+        }
+
+        if (!isset($headers['access-control-allow-headers'])) {
+            $this->setResponseProperty(
+                'Header Check / Access-Control-Allow-Headers',
+                '',
+                self::VALIDATION_CODE_FAIL,
+                'The header could not be located in the response.'
+            );
+        } else {
+
+            $pieces = explode(',', $headers['access-control-allow-headers']);
+            $pieces = array_map('trim', $pieces);
+            $pieces = array_map('strtolower', $pieces);
+
+            if (!in_array('payid-version', $pieces)) {
+                $this->setResponseProperty(
+                    'Header Check / Access-Control-Allow-Headers',
+                    $headers['access-control-allow-headers'],
+                    self::VALIDATION_CODE_FAIL,
+                    'The [PayID-Version] header was not specified.'
+                );
+            } else {
+                $this->setResponseProperty(
+                    'Header Check / Access-Control-Allow-Headers',
+                    $headers['access-control-allow-headers'],
+                    self::VALIDATION_CODE_PASS
+                );
+            }
+        }
+
+        if (!isset($headers['access-control-expose-headers'])) {
+            $this->setResponseProperty(
+                'Header Check / Access-Control-Expose-Headers',
+                '',
+                self::VALIDATION_CODE_FAIL,
+                'The header could not be located in the response.'
+            );
+        } else {
+
+            $pieces = explode(',', $headers['access-control-expose-headers']);
+            $pieces = array_map('trim', $pieces);
+            $pieces = array_map('strtolower', $pieces);
+
+            $exposed = [
+                'PayID-Version',
+                'PayID-Server-Version',
+            ];
+
+            $exposedErrors = [];
+            
+            foreach ($exposed as $header) {
+                if (!in_array(strtolower($header), $pieces)) {
+                    $exposedErrors[] = 'Header [' . $header . '] not included.';
+                }
+            }
+
+            if (count($exposedErrors)) {
+                $this->setResponseProperty(
+                    'Header Check / Access-Control-Expose-Headers',
+                    $headers['access-control-expose-headers'],
+                    self::VALIDATION_CODE_FAIL,
+                    implode(' ', $exposedErrors)
+                );
+            } else {
+                $this->setResponseProperty(
+                    'Header Check / Access-Control-Expose-Headers',
+                    $headers['access-control-expose-headers'],
+                    self::VALIDATION_CODE_PASS
+                );
+            }
+        }
     }
     
     /**
@@ -540,4 +686,21 @@ class PayIDValidator {
 
         return $this->jsonValidator;
     }
+
+    /**
+     * Method to parse a string of headers
+     */
+    private function parseResponseHeaders(string $headersString): array
+    {
+        $headers = [];
+        
+        $headerStrings = explode("\n", $headersString);
+
+        foreach ($headerStrings as $headerString) {
+            $pieces = explode(':', $headerString, 2);
+            $headers[trim($pieces[0])] = trim($pieces[1]);
+        }
+
+        return $headers;
+    } 
 }

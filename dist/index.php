@@ -7,7 +7,7 @@ $payIDValidator = new PayIDValidator();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $payIDValidator->setUserDefinedProperties(
-        $_POST['pay-id'],
+        trim($_POST['pay-id']),
         $_POST['request-type']
     );
 

@@ -225,10 +225,13 @@ class PayIDValidator {
         curl_close ($curl);
 
         $this->checkStatusCode($info['http_code']);
-        $this->checkContentType($info['content_type']);
-        $this->checkResponseTime($info['total_time']);
-        $this->checkResponseBodyForValidity($body);
-        $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
+
+        if ($info['http_code'] === 200) {
+            $this->checkContentType($info['content_type']);
+            $this->checkResponseTime($info['total_time']);
+            $this->checkResponseBodyForValidity($body);
+            $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
+        }
 
         $this->hasValidationOccured = true;
 

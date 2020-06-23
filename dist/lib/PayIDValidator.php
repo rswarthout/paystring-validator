@@ -201,7 +201,7 @@ class PayIDValidator {
     public function makeRequest(): bool
     {
         $payIdPieces = explode('$', $this->payId);
-        $formattedRequestUrl = 'http://' . $payIdPieces[1] . '/' . $payIdPieces[0];
+        $formattedRequestUrl = 'https://' . $payIdPieces[1] . '/' . $payIdPieces[0];
 
         $curl = curl_init();
         curl_setopt_array($curl, [
@@ -232,7 +232,7 @@ class PayIDValidator {
             $this->checkResponseBodyForValidity($body);
             $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
         }
-
+        
         $this->hasValidationOccured = true;
 
         return true;

@@ -264,8 +264,10 @@ class PayIDValidator {
     private function checkContentType(string $contentType)
     {
         $code = self::VALIDATION_CODE_FAIL;
+        $headerPieces = explode(';', $contentType);
+        $headerPieces = array_map('trim', $headerPieces);
 
-        if ($contentType === 'application/json') {
+        if (in_array('application/json', $headerPieces)) {
             $code = self::VALIDATION_CODE_PASS;
         }
 

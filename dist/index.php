@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <title>PayID Validator</title>
+    <meta name="monetization" content="$ilp.uphold.com/dB6fefJ7xJn3">
 </head>
 
 <body class="flex flex-col antialiased font-sans bg-gray-100 min-h-screen">

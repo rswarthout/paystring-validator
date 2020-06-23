@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-white">
             <div class="max-w-screen-xl mx-auto py-8 px-4 flex items-center justify-between">
                 <div class="flex justify-center md:order-2">
-                    <span class="text-gray-500">Did this validator help you? Consider sending me a tip <a href="">@robertswarthout</a>.</span>
+                    <span class="text-gray-500">Did this validator help you? Consider sending me a tip @robertswarthout.</span>
                     <a href="https://twitter.com/robertswarthout" class="ml-6 text-gray-400 hover:text-gray-500">
                         <span class="sr-only">Twitter</span>
                         <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">

@@ -1,0 +1,27 @@
+{
+  "name": "payid-validator",
+  "version": "1.0.0",
+  "description": "A simple app that validates PayID requests.",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwind build src/assets/css/style.css -o dist/assets/css/style.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rswarthout/payid-validator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rswarthout/payid-validator/issues"
+  },
+  "homepage": "https://github.com/rswarthout/payid-validator#readme",
+  "dependencies": {
+    "@tailwindcss/ui": "^0.3.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.8.2",
+    "tailwindcss": "^1.4.6"
+  }
+}

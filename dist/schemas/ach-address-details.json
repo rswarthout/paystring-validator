@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "accountNumber": {
+            "type": "string"
+        },
+        "routingNumber": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "accountNumber",
+        "routingNumber"
+    ]
+}

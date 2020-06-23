@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "properties": {
+        "addresses": {
+            "type": "array"
+        },
+        "proofOfControlSignature": {
+            "type": "string"
+        },
+        "payId": {
+            "type": "string"
+        },
+        "memo": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "addresses"
+    ]
+}

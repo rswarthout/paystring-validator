@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "properties": {
+        "paymentNetwork": {
+            "type": "string"
+        },
+        "environment": { 
+            "type": "string" 
+        },
+        "addressDetailsType": { 
+            "type": "string",
+            "enum": [
+                "CryptoAddressDetails", 
+                "AchAddressDetails"
+            ] 
+        },
+        "addressDetails": {
+            "type": "object" 
+        }
+    },
+    "required": [
+        "paymentNetwork", 
+        "addressDetailsType",
+        "addressDetails"
+    ]
+}

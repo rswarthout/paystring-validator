@@ -481,6 +481,7 @@ class PayIDValidator {
     private function checkResponseBodyForNetworkAndEnvironmentCorrectness(string $body)
     {
         $json = json_decode($body);
+        $code = self::VALIDATION_CODE_FAIL;
         $requestHeader = $this->requestTypes[$this->networkType]['header'];
 
         if ($json) {

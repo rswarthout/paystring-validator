@@ -88,14 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             PayID address
                                         </label>
                                         <div class="mt-1 rounded-md shadow-sm">
-                                            <input id="pay-id" 
-                                                name="pay-id" 
-                                                type="text" 
-                                                aria-label="PayID address" 
-                                                placeholder="alice$example.com" 
-                                                required 
-                                                value="<?php echo htmlentities($payIDValidator->getPayId()) ?>"
-                                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out" />
+                                            <input id="pay-id" name="pay-id" type="text" aria-label="PayID address" placeholder="alice$example.com" required value="<?php echo htmlentities($payIDValidator->getPayId()) ?>" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out" />
                                         </div>
                                     </div>
 
@@ -107,8 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <option value="">Choose request type</option>
                                             <?php $payIdRequestTypes = $payIDValidator->getAllRequestTypes(); ?>
                                             <?php foreach ($payIdRequestTypes as $id => $details) : ?>
-                                                <option value="<?php echo $id ?>"
-                                                    <?php echo (($payIDValidator->getNetworkType() === $id)? 'selected="selected"': '') ?>>
+                                                <option value="<?php echo $id ?>" <?php echo (($payIDValidator->getNetworkType() === $id) ? 'selected="selected"' : '') ?>>
                                                     <?php echo $details['label']; ?> - <?php echo $details['header']; ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -128,6 +120,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
                     </div>
+
+                    <?php if (!$payIDValidator->hasValidationOccured()) : ?>
+                        <div class="flex flex-col justify-center">
+                            <div class="w-full max-w-xl mx-auto">
+                                <div class="bg-white shadow mt-10 px-10 py-8 rounded-lg">
+                                    <span class="text-3xl font-medium text-gray-900">
+                                        Validation / Checks Performed
+                                    </span>
+                                    <ul class="list-inside list-disc pl-3">
+                                        <li>HTTP Status Code</li>
+                                        <li>
+                                            CORS Headers
+                                            <ul class="list-inside list-disc pl-3">
+                                                <li>Access-Control-Allow-Origin</li>
+                                                <li>Access-Control-Allow-Methods</li>
+                                                <li>Access-Control-Allow-Headers</li>
+                                                <li>Access-Control-Expose-Headers</li>
+                                            </ul>
+                                        </li>
+                                        <li>Content-Type header check</li>
+                                        <li>Response Time</li>
+                                        <li>JSON Schema Validation of response body</li>
+                                        <li>Validation of Address to Content-Type header</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if ($payIDValidator->hasValidationOccured()) : ?>
                         <div class="flex flex-col bg-white shadow mt-3 px-4 rounded-lg">
@@ -189,13 +209,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="px-6 py-4  text-sm leading-5 font-medium">
-                                                        <?php if (is_array($validation['msg'])): ?>
+                                                        <?php if (is_array($validation['msg'])) : ?>
                                                             <ul>
-                                                                <?php foreach ($validation['msg'] as $msg): ?>
+                                                                <?php foreach ($validation['msg'] as $msg) : ?>
                                                                     <li><?php echo $msg; ?></li>
                                                                 <?php endforeach; ?>
                                                             </ul>
-                                                        <?php else: ?>
+                                                        <?php else : ?>
                                                             <?php echo $validation['msg']; ?>
                                                         <?php endif; ?>
                                                     </td>

@@ -465,6 +465,9 @@ class PayIDValidator {
                 $code = self::VALIDATION_CODE_PASS;
                 $msg = 'The response body is valid JSON.';  
             }
+        } else {
+            // Considering we know this is not valid JSON we are protecting the user here.
+            $body = strip_tags($body);
         }
 
         $this->setResponseProperty(

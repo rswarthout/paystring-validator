@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $appLogger->pushProcessor(function ($record) use ($payId, $requestType) {
         $record['extra']['pay-id'] = $payId;
         $record['extra']['request-type'] = $requestType;
-    
+
         return $record;
     });
 
@@ -69,11 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="py-10">
             <main>
-                <div class="max-w-7xl mx-auto px-8">
+                <div class="max-w-7xl mx-auto px-4">
 
                     <div class="flex flex-col justify-center">
                         <div>
-                            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                            <h2 class="mt-2 lg:mt-6 text-center text-3xl font-extrabold text-gray-900">
                                 Validate your PayID server responses
                             </h2>
                         </div>
@@ -181,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                                         Request Details
                                     </h3>
+                                    
                                     <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
                                         The details of the validation request.
                                     </p>
@@ -224,78 +225,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        <div class="flex flex-col mt-3">
-                            <div class="bg-white shadow overflow-hidden rounded-lg">
-                                <div class="py-5 border-b border-gray-200 px-6">
-                                    <div class="flex justify-between">
-                                        <div class="text-lg leading-6 font-medium text-gray-900">
-                                            Validation Results
-                                        </div>
-                                        <div class="text-lg leading-6 font-medium text-gray-900">
-                                            Score: <?php echo $payIDValidator->getValidationScore(); ?>%
-                                        </div>
-                                    </div>
+                        <div class="bg-white px-6 py-5 mt-3 border-b border-gray-200 rounded-lg shadow">
+                            <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                                <div class="ml-4 mt-2">
+                                    <h3 class="text-xl leading-6 font-medium text-gray-900">
+                                        Validation Results
+                                    </h3>
                                 </div>
-                                <div class="py-5 px-6">
-                                    <table class="min-w-full bg-white table-fixed">
-                                        <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                                    Check
-                                                </th>
-                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider w-1/2">
-                                                    Value
-                                                </th>
-                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                                    Result
-                                                </th>
-                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                                    Message
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($payIDValidator->getResponseProperties() as $i => $validation) : ?>
-                                                <tr class="<?php echo (($i % 2) ? 'bg-gray-100' : 'bg-white') ?> ">
-                                                    <td class="px-6 py-4 whitespace-no-wrap font-medium ">
-                                                        <?php echo $validation['label']; ?>
-                                                    </td>
-                                                    <td class="px-6 py-4 ">
-                                                        <?php echo $validation['value']; ?>
-                                                    </td>
-                                                    <td class="px-6 py-4 whitespace-no-wrap ">
-                                                        <?php if ($validation['code'] === PayIDValidator::VALIDATION_CODE_PASS) : ?>
-                                                            <span class="px-3 inline-flex font-semibold rounded-full bg-green-100 text-green-800">
-                                                                Pass
-                                                            </span>
-                                                        <?php elseif ($validation['code'] === PayIDValidator::VALIDATION_CODE_WARN) : ?>
-                                                            <span class="px-3 inline-flex font-semibold rounded-full bg-orange-100 text-orange-800">
-                                                                Warn
-                                                            </span>
-                                                        <?php elseif ($validation['code'] === PayIDValidator::VALIDATION_CODE_FAIL) : ?>
-                                                            <span class="px-3 inline-flex font-semibold rounded-full bg-red-100 text-red-800">
-                                                                Fail
-                                                            </span>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                    <td class="px-6 py-4  text-sm leading-5 font-medium">
-                                                        <?php if (is_array($validation['msg'])) : ?>
-                                                            <ul>
-                                                                <?php foreach ($validation['msg'] as $msg) : ?>
-                                                                    <li><?php echo $msg; ?></li>
-                                                                <?php endforeach; ?>
-                                                            </ul>
-                                                        <?php else : ?>
-                                                            <?php echo $validation['msg']; ?>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                                <div class="ml-4 mt-2 flex-shrink-0">
+                                    <span class="inline-flex text-xl font-medium">
+                                        Score <?php echo $payIDValidator->getValidationScore(); ?>%
+                                    </span>
                                 </div>
                             </div>
                         </div>
+
+                        <?php foreach ($payIDValidator->getResponseProperties() as $i => $validation) : ?>
+                            <div class="flex flex-col mt-3">
+                                <div class="bg-white shadow overflow-hidden rounded-lg">
+                                    <div class="py-5 border-b border-gray-200 px-6">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                            <?php echo $validation['label']; ?>
+                                        </h3>
+                                    </div>
+                                    <div class="py-5 px-6">
+                                        <dl class="grid col-gap-4 row-gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                            <div class="col-span-1">
+                                                <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                    Value
+                                                </dt>
+                                                <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                    <?php echo $validation['value']; ?>
+                                                </dd>
+                                            </div>
+                                            <div class="col-span-1">
+                                                <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                    Result
+                                                </dt>
+                                                <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                    <?php if ($validation['code'] === PayIDValidator::VALIDATION_CODE_PASS) : ?>
+                                                        <span class="px-3 inline-flex font-semibold rounded-full bg-green-800 text-green-100">
+                                                            Pass
+                                                        </span>
+                                                    <?php elseif ($validation['code'] === PayIDValidator::VALIDATION_CODE_WARN) : ?>
+                                                        <span class="px-3 inline-flex font-semibold rounded-full bg-orange-800 text-orange-100">
+                                                            Warn
+                                                        </span>
+                                                    <?php elseif ($validation['code'] === PayIDValidator::VALIDATION_CODE_FAIL) : ?>
+                                                        <span class="px-3 inline-flex font-semibold rounded-full bg-red-800 text-red-100">
+                                                            Fail
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </dd>
+                                            </div>
+                                            <div class="col-span-1">
+                                                <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                    Message
+                                                </dt>
+                                                <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                    <?php if (is_array($validation['msg'])) : ?>
+                                                        <ul>
+                                                            <?php foreach ($validation['msg'] as $msg) : ?>
+                                                                <li><?php echo $msg; ?></li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    <?php else : ?>
+                                                        <?php echo ((strlen($validation['msg'])) ? $validation['msg'] : '<span>-</span>'); ?>
+                                                    <?php endif; ?>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     <?php endif; ?>
 
                 </div>

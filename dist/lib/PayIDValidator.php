@@ -286,7 +286,7 @@ class PayIDValidator {
         }
 
         $this->setResponseProperty(
-            'Status Code',
+            'HTTP Status Code',
             $statusCode,
             $code
         );

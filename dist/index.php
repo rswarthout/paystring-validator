@@ -3,11 +3,11 @@ require 'vendor/autoload.php';
 
 use Monolog\ErrorHandler;
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
+use Monolog\Handler\ErrorLogHandler;
 
 // Let's setup error/exception handling globally
 $logger = new Logger('app');
-$logger->pushHandler(new StreamHandler('php://stderr'));
+$logger->pushHandler(new ErrorLogHandler());
 ErrorHandler::register($logger);
 
 $payIDValidator = new PayIDValidator();

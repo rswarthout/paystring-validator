@@ -6,25 +6,33 @@ use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
 
 // Let's setup error/exception handling globally
-$logger = new Logger('app');
-$logger->pushHandler(new ErrorLogHandler());
-ErrorHandler::register($logger);
+$phpLogger = new Logger('php');
+$phpLogger->pushHandler(new ErrorLogHandler());
+ErrorHandler::register($phpLogger);
 
-$payIDValidator = new PayIDValidator();
+// Logging to be used wthin the app for debugging
+$appLogger = new Logger('app');
+$appLogger->pushHandler(new ErrorLogHandler());
+
+$payIDValidator = new PayIDValidator(true);
+$payIDValidator->setLogger($appLogger);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $logger->info(
-        'validation',
-        [
-            $_POST['pay-id'],
-            $_POST['request-type'],
-        ] 
-    );
+    $payId = trim($_POST['pay-id']);
+    $requestType = trim($_POST['request-type']);
+
+    // Add context to the logging for further debugging
+    $appLogger->pushProcessor(function ($record) use ($payId, $requestType) {
+        $record['extra']['pay-id'] = $payId;
+        $record['extra']['request-type'] = $requestType;
+    
+        return $record;
+    });
 
     $payIDValidator->setUserDefinedProperties(
-        trim($_POST['pay-id']),
-        $_POST['request-type']
+        $payId,
+        $requestType
     );
 
     if (!$payIDValidator->hasPreflightErrors()) {
@@ -169,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php if ($payIDValidator->hasValidationOccured()) : ?>
                         <div class="flex flex-col mt-3">
                             <div class="bg-white shadow overflow-hidden rounded-lg">
-                                <div class="px-4 py-5 border-b border-gray-200 px-6">
+                                <div class="py-5 border-b border-gray-200 px-6">
                                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                                         Request Details
                                     </h3>
@@ -177,8 +185,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         The details of the validation request.
                                     </p>
                                 </div>
-                                <div class="px-4 py-5 px-6">
-                                    <dl class="grid grid-cols-1 col-gap-4 row-gap-8 grid-cols-4">
+                                <div class="py-5 px-6">
+                                    <dl class="grid col-gap-4 row-gap-8 grid-cols-4">
                                         <div class="col-span-1">
                                             <dt class="text-sm leading-5 font-medium text-gray-500">
                                                 Request URL
@@ -218,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="flex flex-col mt-3">
                             <div class="bg-white shadow overflow-hidden rounded-lg">
-                                <div class="px-4 py-5 border-b border-gray-200 px-6">
+                                <div class="py-5 border-b border-gray-200 px-6">
                                     <div class="flex justify-between">
                                         <div class="text-lg leading-6 font-medium text-gray-900">
                                             Validation Results
@@ -228,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="px-4 py-5 px-6">
+                                <div class="py-5 px-6">
                                     <table class="min-w-full bg-white table-fixed">
                                         <thead>
                                             <tr>

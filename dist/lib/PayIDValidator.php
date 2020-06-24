@@ -107,6 +107,26 @@ class PayIDValidator {
     private $jsonValidator;
 
     /**
+     * Property to hold the logger
+     * 
+     * @var Monolog\Logger
+     */
+    private $logger;
+
+    /**
+     * Property to hold the state of debugMode
+     */
+    private $debugMode = false;
+
+    /**
+     * Public constructor
+     */
+    public function __construct(bool $debugMode = false)
+    {
+        $this->debugMode = $debugMode;
+    }
+
+    /**
      *  Set's the user defined PayID and network type
      */
     public function setUserDefinedProperties(
@@ -210,6 +230,10 @@ class PayIDValidator {
      */
     public function makeRequest(): bool
     {
+        if ($this->debugMode) {
+            $this->logger->info('validation started');
+        }
+
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_RETURNTRANSFER => true,
@@ -658,6 +682,17 @@ class PayIDValidator {
             'code' => $code,
             'msg' => $msg,
         ];
+
+        if ($this->debugMode) {
+            $this->logger->info(
+                strtolower($label), 
+                [
+                    'value' => $value,
+                    'code' => $code,
+                    'msg' => $msg,
+                ]
+            );
+        }
     }
 
     /**
@@ -702,7 +737,13 @@ class PayIDValidator {
             }
         }
 
-        return round(($score / ($entries * $passPoints)) * 100, 2);
+        $score = round(($score / ($entries * $passPoints)) * 100, 2);
+
+        if ($this->debugMode) {
+            $this->logger->info('validation score', [$score]);
+        }
+
+        return $score;
     }
 
     /**
@@ -734,4 +775,12 @@ class PayIDValidator {
 
         return $headers;
     } 
+
+    /**
+     * Method to set the logger
+     */
+    public function setLogger(Monolog\Logger $logger)
+    {
+        $this->logger = $logger;
+    }
 }

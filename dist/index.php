@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </p>
                                 </div>
                                 <div class="py-5 px-6">
-                                    <dl class="grid col-gap-4 row-gap-8 grid-cols-4">
+                                    <dl class="grid col-gap-4 row-gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                                         <div class="col-span-1">
                                             <dt class="text-sm leading-5 font-medium text-gray-500">
                                                 Request URL

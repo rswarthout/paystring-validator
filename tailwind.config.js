@@ -9,8 +9,10 @@ module.exports = {
     separator: ':',
     theme: {
         screens: {
+            sm: '640px',
             md: '768px',
             lg: '1024px',
+            xl: '1280px',
         },
         colors: {
             transparent: 'transparent',
@@ -214,7 +216,6 @@ module.exports = {
         divideColor: theme => theme('borderColor'),
         divideOpacity: theme => theme('borderOpacity'),
         divideWidth: theme => theme('borderWidth'),
-
         fill: {
             current: 'currentColor',
         },

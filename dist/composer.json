@@ -1,5 +1,20 @@
 {
+    "autoload": {
+        "psr-0": {
+            "": "lib/"
+        }
+    },
     "require": {
-        "justinrainbow/json-schema": "^5.2"
+        "justinrainbow/json-schema": "^5.2",
+        "monolog/monolog": "^2.1"
+    },
+    "config": {
+        "vendor-dir": "vendor",
+        "preferred-install": "dist",
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "github-domains": [
+            "github.com"
+        ]
     }
 }

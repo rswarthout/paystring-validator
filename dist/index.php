@@ -1,6 +1,14 @@
 <?php
 require 'vendor/autoload.php';
-require 'lib/PayIDValidator.php';
+
+use Monolog\ErrorHandler;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+// Let's setup error/exception handling globally
+$logger = new Logger('app');
+$logger->pushHandler(new StreamHandler('php://stderr'));
+ErrorHandler::register($logger);
 
 $payIDValidator = new PayIDValidator();
 
@@ -22,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <title>PayID Validator</title>
     <meta name="monetization" content="$ilp.uphold.com/dB6fefJ7xJn3">
@@ -31,12 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="flex flex-col antialiased font-sans bg-gray-100 min-h-screen">
 
     <div class="flex-grow">
-        <nav class="bg-white ">
+        <nav class="bg-white">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex justify-between h-16">
                     <div class="flex">
                         <div class="flex-shrink-0 flex items-center text-2xl">
-                            <img class="inline h-8 mr-2" src="assets/img/payid-logo.svg" alt="PayID Logo" /> Validator
+                            <img class="inline h-8 mr-2" src="/assets/img/payid-logo.svg" alt="PayID Logo" /> Validator
                         </div>
                     </div>
                 </div>

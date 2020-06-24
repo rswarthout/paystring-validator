@@ -428,14 +428,14 @@ class PayIDValidator {
 
         preg_match(
                 '/application\/[\w\-]*[\+]*json/i', 
-                $info['content_type'], 
+                $headers['content_type'], 
                 $headerPieces
         );
 
         if (count($headerPieces)) {
             $this->setResponseProperty(
                 'Content Type',
-                $info['content_type'],
+                $headers['content_type'],
                 self::VALIDATION_CODE_PASS
             );
             return;
@@ -443,7 +443,7 @@ class PayIDValidator {
 
         $this->setResponseProperty(
             'Content Type',
-            ((strlen($info['content_type'])) ? $info['content_type']: ''),
+            ((strlen($headers['content_type'])) ? $headers['content_type']: ''),
             self::VALIDATION_CODE_FAIL,
             'The value of [application/json] or other variants could not be found.'
         );
@@ -510,6 +510,7 @@ class PayIDValidator {
     {
         $json = json_decode($body);
         $code = self::VALIDATION_CODE_FAIL;
+        $msg = '';
         $requestHeader = $this->requestTypes[$this->networkType]['header'];
 
         if ($json) {
@@ -727,7 +728,8 @@ class PayIDValidator {
 
         foreach ($headerStrings as $headerString) {
             $pieces = explode(':', $headerString, 2);
-            $headers[trim($pieces[0])] = trim($pieces[1]);
+            $headers[trim($pieces[0])] = 
+                (isset($pieces[1]) ? trim($pieces[1]) : '');
         }
 
         return $headers;

@@ -14,6 +14,14 @@ $payIDValidator = new PayIDValidator();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $logger->info(
+        'validation',
+        [
+            $_POST['pay-id'],
+            $_POST['request-type'],
+        ] 
+    );
+
     $payIDValidator->setUserDefinedProperties(
         trim($_POST['pay-id']),
         $_POST['request-type']

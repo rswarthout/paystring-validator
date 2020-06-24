@@ -195,14 +195,21 @@ class PayIDValidator {
         return false;
     }
 
+    /**
+     * Method to return the request URL for the validation
+     */
+    public function getRequestUrl(): string
+    {
+        $payIdPieces = explode('$', $this->getPayId());
+        
+        return 'https://' . $payIdPieces[1] . '/' . $payIdPieces[0];
+    }
+
     /** 
      * Method to make the request to the PayID server
      */
     public function makeRequest(): bool
     {
-        $payIdPieces = explode('$', $this->payId);
-        $formattedRequestUrl = 'https://' . $payIdPieces[1] . '/' . $payIdPieces[0];
-
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_RETURNTRANSFER => true,
@@ -210,7 +217,7 @@ class PayIDValidator {
             CURLOPT_USERAGENT => 'PayIDValidator.com / 0.1.0',
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HEADER => true,
-            CURLOPT_URL => $formattedRequestUrl,
+            CURLOPT_URL => $this->getRequestUrl(),
             CURLOPT_HTTPHEADER => [
                 'PayID-Version: 1.0',
                 'Accept: ' . $this->requestTypes[$this->networkType]['header'],

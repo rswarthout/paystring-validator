@@ -151,23 +151,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <?php if ($payIDValidator->hasValidationOccured()) : ?>
-                        <div class="flex flex-col bg-white shadow mt-3 px-4 rounded-lg">
-
-                            <div class="bg-white pt-5 border-b border-gray-200">
-                                <div class="flex items-center justify-between flex-wrap">
-                                    <div class="mt-2">
-                                        <span class="text-3xl font-medium text-gray-900">
-                                            Validation Results
-                                        </span>
-                                    </div>
-                                    <div class="mt-2 flex-shrink-0">
-                                        <span class="text-3xl">Score: <?php echo $payIDValidator->getValidationScore(); ?>%</span>
-                                    </div>
+                        <div class="flex flex-col mt-3">
+                            <div class="bg-white shadow overflow-hidden rounded-lg">
+                                <div class="px-4 py-5 border-b border-gray-200 px-6">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                        Request Details
+                                    </h3>
+                                    <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
+                                        The details of the validation request.
+                                    </p>
+                                </div>
+                                <div class="px-4 py-5 px-6">
+                                    <dl class="grid grid-cols-1 col-gap-4 row-gap-8 grid-cols-4">
+                                        <div class="col-span-1">
+                                            <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                Request URL
+                                            </dt>
+                                            <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                <?php echo $payIDValidator->getRequestUrl(); ?>
+                                            </dd>
+                                        </div>
+                                        <div class="col-span-1">
+                                            <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                Request Type
+                                            </dt>
+                                            <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                GET
+                                            </dd>
+                                        </div>
+                                        <div class="col-span-1">
+                                            <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                Header / Accept
+                                            </dt>
+                                            <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                <?php echo $payIdRequestTypes[$payIDValidator->getNetworkType()]['header']; ?>
+                                            </dd>
+                                        </div>
+                                        <div class="col-span-1">
+                                            <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                Header / PayID-Version
+                                            </dt>
+                                            <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                1.0
+                                            </dd>
+                                        </div>
+                                    </dl>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="my-2 py-2 overflow-x-auto">
-                                <div class="align-middle inline-block min-w-full shadow overflow-hidden">
+                        <div class="flex flex-col mt-3">
+                            <div class="bg-white shadow overflow-hidden rounded-lg">
+                                <div class="px-4 py-5 border-b border-gray-200 px-6">
+                                    <div class="flex justify-between">
+                                        <div class="text-lg leading-6 font-medium text-gray-900">
+                                            Validation Results
+                                        </div>
+                                        <div class="text-lg leading-6 font-medium text-gray-900">
+                                            Score: <?php echo $payIDValidator->getValidationScore(); ?>%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="px-4 py-5 px-6">
                                     <table class="min-w-full bg-white table-fixed">
                                         <thead>
                                             <tr>

@@ -4,7 +4,8 @@
   "description": "A simple app that validates PayID requests.",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwind build src/assets/css/style.css -o dist/assets/css/style.css"
+    "build:css:dev": "tailwind build src/assets/css/style.css -o dist/assets/css/style.css",
+    "build:css:production": "export NODE_ENV=production && tailwind build src/assets/css/style.css -o dist/assets/css/style.css"
   },
   "repository": {
     "type": "git",

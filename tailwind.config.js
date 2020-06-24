@@ -1,10 +1,8 @@
 module.exports = {
-    purge: {
-        enabled: true,
-        content: [
-            './dist/**/*.php',
-        ],
-    },
+    purge: [
+        './dist/**/*.php',
+        './dist/**/*.html',
+    ],
     target: 'relaxed',
     prefix: '',
     important: false,

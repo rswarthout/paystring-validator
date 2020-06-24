@@ -230,7 +230,7 @@ class PayIDValidator {
         $this->checkCORSHeaders($headers);
 
         if ($info['http_code'] === 200) {
-            $this->checkContentType($info['content_type']);
+            $this->checkContentType($info);
             $this->checkResponseTime($info['total_time']);
             $this->checkResponseBodyForValidity($body);
             $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
@@ -407,20 +407,38 @@ class PayIDValidator {
     /**
      * Method to do the check the content type header returned
      */
-    private function checkContentType(string $contentType)
+    private function checkContentType(array $headers)
     {
-        $code = self::VALIDATION_CODE_FAIL;
-        $headerPieces = explode(';', $contentType);
-        $headerPieces = array_map('trim', $headerPieces);
+        if (!isset($headers['content_type'])) {
+            $this->setResponseProperty(
+                'Header Check / Content-Type',
+                '',
+                self::VALIDATION_CODE_FAIL,
+                'The header was not sent in the response.'
+            );
+            return;
+        }
 
-        if (in_array('application/json', $headerPieces)) {
-            $code = self::VALIDATION_CODE_PASS;
+        preg_match(
+                '/application\/[\w\-]*[\+]*json/i', 
+                $info['content_type'], 
+                $headerPieces
+        );
+
+        if (count($headerPieces)) {
+            $this->setResponseProperty(
+                'Content Type',
+                $info['content_type'],
+                self::VALIDATION_CODE_PASS
+            );
+            return;
         }
 
         $this->setResponseProperty(
             'Content Type',
-            $contentType,
-            $code
+            ((strlen($info['content_type'])) ? $info['content_type']: ''),
+            self::VALIDATION_CODE_FAIL,
+            'The value of [application/json] or other variants could not be found.'
         );
     }
 

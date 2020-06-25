@@ -261,6 +261,7 @@ class PayIDValidator {
         $this->checkCORSHeaders($headers);
 
         if ($info['http_code'] === 200) {
+            $this->checkCacheControl($headers);
             $this->checkContentType($info);
             $this->checkResponseTime($info['total_time']);
             $this->checkResponseBodyForValidity($body);
@@ -433,6 +434,38 @@ class PayIDValidator {
                 );
             }
         }
+    }
+
+    /**
+     * Method to check for a valid Cache-Control header
+     */
+    private function checkCacheControl(array $headers)
+    {
+        if (!isset($headers['cache-control'])) {
+            $this->setResponseProperty(
+                'Header Check / Cache-Control',
+                '',
+                self::VALIDATION_CODE_FAIL,
+                'The header was not set in the response.'
+            );
+            return;
+        }
+
+        if ($headers['cache-control'] != 'no-store') {
+            $this->setResponseProperty(
+                'Header Check / Cache-Control',
+                $headers['cache-control'],
+                self::VALIDATION_CODE_FAIL,
+                'The header value is not correct. Excepted value "no-store".'
+            );
+            return;
+        }
+
+        $this->setResponseProperty(
+            'Header Check / Cache-Control',
+            $headers['cache-control'],
+            self::VALIDATION_CODE_PASS
+        );
     }
     
     /**

@@ -20,8 +20,6 @@ phases:
       - mv composer.phar /usr/local/bin/composer
   pre_build:
     commands:
-      - echo Entered the pre_build pahse...
-      - yarn install
   build:
     commands:
       - Entered the build phase...

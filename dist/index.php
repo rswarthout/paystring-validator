@@ -165,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </ul>
                                         </li>
                                         <li>Content-Type header check</li>
+                                        <li>Cache-Control header check</li>
                                         <li>Response Time</li>
                                         <li>JSON Schema Validation of response body</li>
                                         <li>Validation of Address to Content-Type header</li>
@@ -181,13 +182,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                                         Request Details
                                     </h3>
-                                    
                                     <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
                                         The details of the validation request.
                                     </p>
                                 </div>
                                 <div class="py-5 px-6">
-                                    <dl class="grid col-gap-4 row-gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                                    <dl class="grid col-gap-4 row-gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
                                         <div class="col-span-1">
                                             <dt class="text-sm leading-5 font-medium text-gray-500">
                                                 Request URL
@@ -202,6 +202,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </dt>
                                             <dd class="mt-1 text-sm leading-5 text-gray-900">
                                                 GET
+                                            </dd>
+                                        </div>
+                                        <div class="col-span-1">
+                                            <dt class="text-sm leading-5 font-medium text-gray-500">
+                                                HTTP Version
+                                            </dt>
+                                            <dd class="mt-1 text-sm leading-5 text-gray-900">
+                                                2
                                             </dd>
                                         </div>
                                         <div class="col-span-1">
@@ -231,6 +239,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <h3 class="text-xl leading-6 font-medium text-gray-900">
                                         Validation Results
                                     </h3>
+                                </div>
+                                <div class="ml-4 mt-2">
+                                    <a href="javascript:;" data-micromodal-trigger="modal-response-headers" class="text-gray-500 underline">View All Response Headers</a>
                                 </div>
                                 <div class="ml-4 mt-2 flex-shrink-0">
                                     <span class="inline-flex text-xl font-medium">
@@ -332,6 +343,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </footer>
+
+    <?php if ($payIDValidator->hasValidationOccured()): ?>
+        <?php // This is the headers modal ?>
+        <div id="modal-response-headers" class="modal fixed bottom-0 inset-x-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:items-center sm:justify-center" aria-hidden="true">
+            <div class="fixed inset-0 transition-opacity">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <div class="relative bg-white rounded-lg px-4 pt-5 pb-4 overflow-hidden shadow-xl transform transition-all sm:max-w-4xl sm:w-full sm:p-6" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                <div>
+                    <h3 class="text-lg text-center leading-6 font-medium text-gray-900" id="modal-headline">
+                        Response Headers
+                    </h3>
+                    <div class="mt-2">
+                        <p class="text-sm leading-5 text-gray-500">
+                            Scroll to see more headers.
+                        </p>
+                    </div>
+                    <div class="mt-2">
+                        <p class="text-sm leading-5 text-gray-500">
+                            <div class="flex flex-col">
+                                <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                    <div class="max-h-screen75 inline-block min-w-full shadow overflow-x-hidden overflow-y-auto rounded-lg border-b border-gray-200">
+                                        <table class="min-w-full">
+                                            <thead>
+                                                <tr>
+                                                    <th class="px-3 py-3 border-b border-gray-400 bg-gray-400 text-left text-xs leading-4 font-medium text-gray-800 uppercase tracking-wider">
+                                                        Header
+                                                    </th>
+                                                    <th class="px-3 py-3 border-b border-gray-400 bg-gray-400 text-left text-xs leading-4 font-medium text-gray-800 uppercase tracking-wider">
+                                                        Value
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php $i = 0; ?>
+                                                <?php foreach ($payIDValidator->getResponseHeaders() as $key => $value): ?>
+                                                    <?php 
+                                                        if (trim($key) == ''):
+                                                            continue;            
+                                                        endif;
+
+                                                        $i++
+                                                    ?>
+                                                    <tr class="<?php echo (($i % 2) ? 'bg-white': 'bg-gray-100') ?>">
+                                                        <td class="px-3 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                                            <?php echo htmlentities(trim($key)); ?>
+                                                        </td>
+                                                        <td class="px-3 py-4 text-sm leading-5 text-gray-500">
+                                                            <?php echo htmlentities(trim($value)); ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6">
+                    <span class="flex w-full rounded-md shadow-sm">
+                        <button type="button" data-custom-close="modal-response-headers" data-micromodal-close class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            Close
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+        <script>MicroModal.init();</script>
+        <style type="text/css">
+            .modal {
+                display: none;
+            }
+
+            .modal.is-open {
+                display: flex;
+            }
+        </style>
+    <?php endif; ?>
 
 </body>
 

@@ -119,6 +119,11 @@ class PayIDValidator {
     private $debugMode = false;
 
     /**
+     * Property to hold the response headers
+     */
+    private $responseHeaders = [];
+
+    /**
      * Public constructor
      */
     public function __construct(bool $debugMode = false)
@@ -258,12 +263,13 @@ class PayIDValidator {
 
         $this->checkStatusCode($info['http_code']);
 
-        $headers = $this->parseResponseHeaders($headerStrings); 
-        $this->checkCORSHeaders($headers);
+        $headers = $this->parseResponseHeaders($headerStrings);
+        $this->responseHeaders = $headers;
 
         if ($info['http_code'] === 200) {
-            $this->checkCacheControl($headers);
-            $this->checkContentType($info);
+            $this->checkCORSHeaders($this->responseHeaders);
+            $this->checkCacheControl($this->responseHeaders);
+            $this->checkContentType($this->responseHeaders);
             $this->checkResponseTime($info['total_time']);
             $this->checkResponseBodyForValidity($body);
             $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
@@ -474,7 +480,7 @@ class PayIDValidator {
      */
     private function checkContentType(array $headers)
     {
-        if (!isset($headers['content_type'])) {
+        if (!isset($headers['content-type'])) {
             $this->setResponseProperty(
                 'Header Check / Content-Type',
                 '',
@@ -486,14 +492,14 @@ class PayIDValidator {
 
         preg_match(
                 '/application\/[\w\-]*[\+]*json/i', 
-                $headers['content_type'], 
+                $headers['content-type'], 
                 $headerPieces
         );
 
         if (count($headerPieces)) {
             $this->setResponseProperty(
                 'Content Type',
-                $headers['content_type'],
+                $headers['content-type'],
                 self::VALIDATION_CODE_PASS
             );
             return;
@@ -501,7 +507,7 @@ class PayIDValidator {
 
         $this->setResponseProperty(
             'Content Type',
-            ((strlen($headers['content_type'])) ? $headers['content_type']: ''),
+            ((strlen($headers['content-type'])) ? $headers['content-type']: ''),
             self::VALIDATION_CODE_FAIL,
             'The value of [application/json] or other variants could not be found.'
         );
@@ -816,5 +822,13 @@ class PayIDValidator {
     public function setLogger(Monolog\Logger $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * Method to return the response headers
+     */
+    public function getResponseHeaders(): array
+    {
+        return $this->responseHeaders;
     }
 }

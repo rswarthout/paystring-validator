@@ -28,6 +28,6 @@ phases:
 artifacts:
   files:
     - '**/*'
-  name: app-$(date +%Y-%m-%d-%H-%M-%S)
+  name: app-$(date +%Y-%m-%d-%H-%M-%S).zip
   discard-paths: no
   base-directory: dist

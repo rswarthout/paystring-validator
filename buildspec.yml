@@ -9,20 +9,16 @@ phases:
     runtime-versions:
       nodejs: 10
     commands:
-      - echo Entered the install phase...
       # Setup Yarn
-      - curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-      - yum -y install yarn
-      #Install composer
+      # - curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
+      # - yum -y install yarn
+      # Install composer
       - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
       - php composer-setup.php
       - php -r "unlink('composer-setup.php');"
       - mv composer.phar /usr/local/bin/composer
-  pre_build:
-    commands:
   build:
     commands:
-      - Entered the build phase...
       # Have composer install the PHP dependencies
       - pwd
       - cd dist && composer install --no-progress --no-suggest && rm -f composer.* && cd -

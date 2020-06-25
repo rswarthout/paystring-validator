@@ -16,6 +16,7 @@ A web app that validates PayID server responses. The intent is to help developer
   - Access-Control-Allow-Headers
   - Access-Control-Expose-Headers
 - Content-Type header check
+- Cache-Control header check
 - Response Time
 - JSON [Schema Validation](https://docs.payid.org/payid-interfaces) of response body
 - Validation of Address to [Accept](https://docs.payid.org/payid-headers#request-headers) header

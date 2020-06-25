@@ -230,15 +230,11 @@ class PayIDValidator {
         return 'https://' . $payIdPieces[1] . '/' . $payIdPieces[0];
     }
 
-    /** 
-     * Method to make the request to the PayID server
+    /**
+     * Method to return the CURL client
      */
-    public function makeRequest(): bool
+    private function getCurlClient()
     {
-        if ($this->debugMode) {
-            $this->logger->info('validation started');
-        }
-
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_RETURNTRANSFER => true,
@@ -253,6 +249,20 @@ class PayIDValidator {
                 'Accept: ' . $this->requestTypes[$this->networkType]['header'],
             ],
         ]);
+
+        return $curl;
+    }
+
+    /** 
+     * Method to make the request to the PayID server
+     */
+    public function makeRequest(): bool
+    {
+        if ($this->debugMode) {
+            $this->logger->info('validation started');
+        }
+
+        $curl = $this->getCurlClient();
         $response = curl_exec($curl);
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $headerStrings = substr($response, 0, $headerSize);
@@ -348,10 +358,25 @@ class PayIDValidator {
             $methodValues = explode(',', $headers['access-control-allow-methods']);
             $methodValues = array_map('trim', $methodValues);
             $methodErrors = [];
+            $msg = '';
             
             foreach ($methods as $method) {
                 if (!in_array($method, $methodValues)) {
-                    $methodErrors[] = 'Method [' . $method . '] not supported.';
+                    $wasFound = false;
+
+                    if ($method === 'OPTIONS') {
+                        // Some hosts only return OPTIONS value when 
+                        // performing a pre-flight request with an OPTIONS request.
+                        $wasFound = $this->performSecondaryOptionsHeaderCheck();
+
+                        if ($wasFound) {
+                            $msg = 'Method [OPTIONS] was found via a secondary OPTIONS pre-flight request.';
+                        }
+                    }
+
+                    if (!$wasFound) {
+                        $methodErrors[] = 'Method [' . $method . '] not supported.';
+                    }
                 }
             }
 
@@ -360,13 +385,15 @@ class PayIDValidator {
                     'Header Check / Access-Control-Allow-Methods',
                     $headers['access-control-allow-methods'],
                     self::VALIDATION_CODE_FAIL,
-                    implode(' ', $methodErrors)
+                    implode(' ', $methodErrors),
+                    $msg
                 );
             } else {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Allow-Methods',
                     $headers['access-control-allow-methods'],
-                    self::VALIDATION_CODE_PASS
+                    self::VALIDATION_CODE_PASS,
+                    $msg
                 );
             }
         }
@@ -441,6 +468,33 @@ class PayIDValidator {
                 );
             }
         }
+    }
+
+    /** 
+     * Perform a secondary check for OPTIONS value for 
+     * the Access-Control-Allow-Methods header. Return TRUE 
+     * if found via OPTIONS request, false if not found. 
+     */
+    private function performSecondaryOptionsHeaderCheck(): bool
+    {
+        $curl = $this->getCurlClient();
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'OPTIONS');
+        $response = curl_exec($curl);
+        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $headerStrings = substr($response, 0, $headerSize);
+        curl_close ($curl);
+
+        $headers = $this->parseResponseHeaders($headerStrings);
+
+        if (!isset($headers['access-control-allow-methods'])) {
+            return false;
+        }
+
+        if (stripos($headers['access-control-allow-methods'], 'OPTIONS') !== false) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

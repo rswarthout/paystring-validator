@@ -241,6 +241,7 @@ class PayIDValidator {
             CURLOPT_USERAGENT => 'PayIDValidator.com / 0.1.0',
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HEADER => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2,
             CURLOPT_URL => $this->getRequestUrl(),
             CURLOPT_HTTPHEADER => [
                 'PayID-Version: 1.0',

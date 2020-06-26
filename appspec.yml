@@ -1,0 +1,42 @@
+version: 0.0
+os: linux
+files:
+  - source: dest/
+    destination: /var/www/html/
+hooks:
+  BeforeBlockTraffic:
+    - location: .aws-code-deploy/before-block-traffic.sh
+      timeout: 30
+      runas: root
+  AfterBlockTraffic:
+    - location: .aws-code-deploy/after-block-traffic.sh
+      timeout: 30
+      runas: root
+  ApplicationStop:
+    - location: .aws-code-deploy/application-stop.sh
+      timeout: 30
+      runas: root
+  BeforeInstall:
+    - location: .aws-code-deploy/before-install.sh
+      timeout: 30
+      runas: root
+  AfterInstall:
+    - location: .aws-code-deploy/after-install.sh
+      timeout: 30
+      runas: root
+  ApplicationStart:
+    - location: .aws-code-deploy/application-start.sh
+      timeout: 30
+      runas: root  
+  ValidateService:
+    - location: .aws-code-deploy/validate-service.sh
+      timeout: 30
+      runas: root 
+  BeforeAllowTraffic:
+    - location: .aws-code-deploy/before-allow-traffic.sh
+      timeout: 30
+      runas: root 
+  AfterAllowTraffic:
+    - location: .aws-code-deploy/after-allow-traffic.sh
+      timeout: 30
+      runas: root 

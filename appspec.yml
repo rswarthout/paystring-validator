@@ -3,6 +3,14 @@ os: linux
 files:
   - source: dist/
     destination: /var/www/html/
+permissions:
+  - object: /var/www
+    pattern: "**"
+    owner: apache
+    group: apche
+    type:
+      - directory
+      - file
 hooks:
   BeforeBlockTraffic:
     - location: .aws-code-deploy/before-block-traffic.sh

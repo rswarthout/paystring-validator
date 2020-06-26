@@ -1,5 +1,3 @@
-![Build Status](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiMTNjeHBsVit2eW5lZDNxR0F3S21jckQxTlVqYnJERlo5cGNVM0dGSkMzczArZ1gzeXlWR2d3VEFkMU84eHlCQ2NhQXVRQkc3TnZkU2hXSEhsVWxnTGZzPSIsIml2UGFyYW1ldGVyU3BlYyI6IktmRUlhdE9nRFlSWUFGU0IiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
-
 # PayID Validator
 A web app that validates PayID server responses. The intent is to help developers building PayID servers and integrating them into already existing systems. The intent is to be in the same line of thinking as ssllabs.com is for SSL site analysis.
 

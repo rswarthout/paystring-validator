@@ -7,7 +7,7 @@ permissions:
   - object: /var/www
     pattern: "**"
     owner: apache
-    group: apche
+    group: apache
     type:
       - directory
       - file

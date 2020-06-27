@@ -1,3 +1,3 @@
 #!/bin/bash
-systemctl start php-fpm
-apachectl start
+systemctl restart php-fpm
+apachectl restart

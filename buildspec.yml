@@ -14,15 +14,12 @@ phases:
       - php composer-setup.php
       - php -r "unlink('composer-setup.php');"
       - mv composer.phar /usr/local/bin/composer
-      # Install dependencies
-      - npm install --save-dev --ignore-scripts install-peers
-      - npm install
-      - npm install -g @tailwindcss/ui
-      - npm install -g @sparkbox/cachebust
   build:
     commands:
       # Have composer install the PHP dependencies
       - cd dist && composer install --no-progress --no-suggest && rm -f composer.* && cd -
+      # Install dependencies
+      - npm install
       # Build/compile the production CSS now
       - npm run build:css
       - npm run cachebust

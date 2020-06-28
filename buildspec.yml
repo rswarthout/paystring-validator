@@ -19,7 +19,7 @@ phases:
       # Have composer install the PHP dependencies
       - cd dist && composer install --no-progress --no-suggest && rm -f composer.* && cd -
       # Build/compile the production CSS now
-      - npm update
+      - npm install
       - npm run build:css
       - npm run cachebust
       # Remove the node_modules directory now that we are done building to make the artifact smaller

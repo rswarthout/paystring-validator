@@ -22,6 +22,7 @@ phases:
       - yarn add tailwindcss --dev
       # Build/compile the production CSS now
       - npm run build:css
+      - npm run cachebust
       # Remove the node_modules directory now that we are done building to make the artifact smaller
       - rm -Rf node_modules
       # No need to keep the "src" directory for a build

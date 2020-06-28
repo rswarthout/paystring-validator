@@ -4,7 +4,8 @@
   "description": "A simple app that validates PayID requests.",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwind build src/assets/css/style.css -o dist/assets/css/style.css"
+    "build:css": "tailwind build src/assets/css/style.css -o dist/assets/css/style.css",
+    "cachebust": "cachebust"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,17 @@
     "@tailwindcss/ui": "^0.3.0"
   },
   "devDependencies": {
-    "autoprefixer": "^9.8.2",
+    "@sparkbox/cachebust": "^0.3.0",
+    "autoprefixer": "^9.8.4",
     "tailwindcss": "^1.4.6"
-  }
+  },
+  "cachebust": {
+    "source": [
+        "dist/assets/css/style.css"
+    ],
+    "target": [
+        "dist/*.php",
+        "dist/**/*.html"
+    ]
+  } 
 }

@@ -16,11 +16,9 @@ phases:
       - mv composer.phar /usr/local/bin/composer
       # Install dependencies
       - npm install --save-dev --ignore-scripts install-peers
+      - npm install
       - npm install -g @tailwindcss/ui
       - npm install -g @sparkbox/cachebust
-  pre_build:
-    commands: 
-      - npm install
   build:
     commands:
       # Have composer install the PHP dependencies

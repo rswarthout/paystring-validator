@@ -15,8 +15,8 @@ phases:
       - php -r "unlink('composer-setup.php');"
       - mv composer.phar /usr/local/bin/composer
       # Install dependencies
-      - npm install -g @tailwindcss/ui
       - npm install -g tailwindcss
+      - npm install -g @tailwindcss/ui
       - npm install -g @sparkbox/cachebust
   pre_build:
     commands: 

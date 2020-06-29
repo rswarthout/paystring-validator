@@ -337,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mt-0">
                     <p class="text-center text-base leading-6 text-gray-500">
-                        Licensed under MIT.
+                        Licensed under MIT. Release <% RELEASE_HASH %>
                     </p>
                 </div>
             </div>

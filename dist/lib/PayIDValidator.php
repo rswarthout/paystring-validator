@@ -70,15 +70,15 @@ class PayIDValidator {
             'header' => 'application/eth-rinkeby+json',
         ],
         self::NETWORK_XRP_MAINNET => [
-            'label' => 'XRP mainnet',
+            'label' => 'XRP (mainnet)',
             'header' => 'application/xrpl-mainnet+json',
         ],
         self::NETWORK_XRP_TESTNET => [
-            'label' => 'XRP testnet',
+            'label' => 'XRP (testnet)',
             'header' => 'application/xrpl-testnet+json',
         ],
         self::NETWORK_XRP_DEVNET => [
-            'label' => 'XRP devnet',
+            'label' => 'XRP (devnet)',
             'header' => 'application/xrpl-devnet+json',
         ],
         self::NETWORK_ACH => [

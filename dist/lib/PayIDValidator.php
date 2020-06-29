@@ -652,16 +652,18 @@ class PayIDValidator {
             $network = $headerPieces[1];
             $environment = $headerPieces[2];
 
-            foreach ($json->addresses as $i => $address) {
-                if (strtolower($address->paymentNetwork) !== strtolower($network)) {
-                    $errors[] = 'The paymentNetwork does not match with request header.';
-                }
-
-                if (isset($address->environment) && strtolower($address->environment) !== strtolower($environment)) {
-                    $errors[] = 'The environment does not match with request header.';
+            if ($this->networkType !== self::NETWORK_ALL) {
+                foreach ($json->addresses as $i => $address) {
+                    if (strtolower($address->paymentNetwork) !== strtolower($network)) {
+                        $errors[] = 'The paymentNetwork does not match with request header.';
+                    }
+    
+                    if (isset($address->environment) && strtolower($address->environment) !== strtolower($environment)) {
+                        $errors[] = 'The environment does not match with request header.';
+                    }
                 }
             }
-            
+
             if (count($errors)) {
                 $code = self::VALIDATION_CODE_FAIL;
                 $msg = $errors;

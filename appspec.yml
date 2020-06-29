@@ -3,7 +3,7 @@ os: linux
 files:
   - source: dist/
     destination: /var/www/html/
-  - source: config/httpd/httpd.conf
+  - source: server-config/httpd/httpd.conf
     destination: /etc/httpd/conf/
 permissions:
   - object: /var/www

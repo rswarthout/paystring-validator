@@ -16,7 +16,7 @@ phases:
       - mv composer.phar /usr/local/bin/composer
   build:
     commands:
-      - sed -i 's/<% RELEASE_HASH %>/$CODEBUILD_RESOLVED_SOURCE_VERSION/g' dist/index.php
+      - sed -i "s/<% RELEASE_HASH %>/$CODEBUILD_RESOLVED_SOURCE_VERSION/g" dist/index.php
       # Have composer install the PHP dependencies
       - cd dist && composer install --no-progress --no-suggest && rm -f composer.* && cd -
       # Install dependencies

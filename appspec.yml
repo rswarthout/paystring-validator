@@ -4,7 +4,7 @@ files:
   - source: dist/
     destination: /var/www/html/
   - source: config/httpd/httpd.conf
-    destination: /etc/httpd/conf/httpd.conf
+    destination: /etc/httpd/conf/
 permissions:
   - object: /var/www
     pattern: "**"

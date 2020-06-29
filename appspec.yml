@@ -5,6 +5,8 @@ files:
     destination: /var/www/html/
   - source: server-config/httpd/httpd.conf
     destination: /etc/httpd/conf/
+  - source: server-config/php/php.ini
+    destination: /etc/
 permissions:
   - object: /var/www
     pattern: "**"
@@ -14,6 +16,12 @@ permissions:
       - directory
       - file
   - object: /etc/httpd/conf/httpd.conf
+    owner: root
+    group: root
+    mode: 644
+    type:
+      - file
+  - object: /etc/php.ini
     owner: root
     group: root
     mode: 644

@@ -5,7 +5,6 @@ files:
     destination: /var/www/html/
   - source: config/httpd/httpd.conf
     destination: /etc/httpd/conf/
-    overwrite: true
 permissions:
   - object: /var/www
     pattern: "**"

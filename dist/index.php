@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <?php if (!$payIDValidator->hasValidationOccured()) : ?>
+                    <?php if (!$payIDValidator->hasValidationOccurred()) : ?>
                         <div class="flex flex-col justify-center">
                             <div class="w-full max-w-xl mx-auto">
                                 <div class="bg-white shadow mt-10 px-10 py-8 rounded-lg">
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($payIDValidator->hasValidationOccured()) : ?>
+                    <?php if ($payIDValidator->hasValidationOccurred()) : ?>
                         <div class="flex flex-col mt-3">
                             <div class="bg-white shadow overflow-hidden rounded-lg">
                                 <div class="py-5 border-b border-gray-200 px-6">
@@ -344,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </footer>
 
-    <?php if ($payIDValidator->hasValidationOccured()): ?>
+    <?php if ($payIDValidator->hasValidationOccurred()): ?>
         <?php // This is the headers modal ?>
         <div id="modal-response-headers" class="modal fixed bottom-0 inset-x-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:items-center sm:justify-center" aria-hidden="true">
             <div class="fixed inset-0 transition-opacity">

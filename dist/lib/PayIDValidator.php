@@ -5,11 +5,18 @@ class PayIDValidator {
     /**
      * Supported networks
      */
-    const NETWORK_ACH = 'ach';
     const NETWORK_ALL = 'all';
+
+    const NETWORK_ACH = 'ach';
+
     const NETWORK_BTC_MAINNET = 'btc-mainnet';
+    const NETWORK_BTC_TESTNET = 'btc-testnet';
+
     const NETWORK_ETH_MAINNET = 'eth-mainnet';
-    const NETWORK_ETH_TESTNET = 'eth-testnet-name';
+    const NETWORK_ETH_ROPSTEN = 'eth-ropsten';
+    const NETWORK_ETH_KOVAN = 'eth-kovan';
+    const NETWORK_ETH_RINKEBY = 'eth-rinkeby';
+
     const NETWORK_XRP_MAINNET = 'xrp-mainnet';
     const NETWORK_XRP_TESTNET = 'xrp-testnet';
     const NETWORK_XRP_DEVNET = 'xrp-devnet';
@@ -42,13 +49,25 @@ class PayIDValidator {
             'label' => 'BTC (mainnet)',
             'header' => 'application/btc-mainnet+json',
         ],
+        self::NETWORK_BTC_TESTNET => [
+            'label' => 'BTC (testnet)',
+            'header' => 'application/btc-testnet+json',
+        ],
         self::NETWORK_ETH_MAINNET => [
             'label' => 'ETH (mainnet)',
             'header' => 'application/eth-mainnet+json',
         ],
-        self::NETWORK_ETH_TESTNET => [
-            'label' => 'ETH (testnet)',
-            'header' => 'application/eth-testnet-name+json',
+        self::NETWORK_ETH_ROPSTEN => [
+            'label' => 'ETH (ropsten)',
+            'header' => 'application/eth-ropsten+json',
+        ],
+        self::NETWORK_ETH_KOVAN => [
+            'label' => 'ETH (kovan)',
+            'header' => 'application/eth-kovan+json',
+        ],
+        self::NETWORK_ETH_RINKEBY => [
+            'label' => 'ETH (rinkeby)',
+            'header' => 'application/eth-rinkeby+json',
         ],
         self::NETWORK_XRP_MAINNET => [
             'label' => 'XRP mainnet',
@@ -79,11 +98,11 @@ class PayIDValidator {
     private $networkType = '';
 
     /**
-     * Property to toggle if validation has occured
-     * 
+     * Property to toggle if validation has occurred
+     *
      * @var bool
      */
-    private $hasValidationOccured = false;
+    private $hasValidationOccurred = false;
 
     /**
      * Array to hold the various errors messages
@@ -284,8 +303,8 @@ class PayIDValidator {
             $this->checkResponseBodyForValidity($body);
             $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
         }
-        
-        $this->hasValidationOccured = true;
+
+        $this->hasValidationOccurred = true;
 
         return true;
     }
@@ -517,7 +536,7 @@ class PayIDValidator {
                 'Header Check / Cache-Control',
                 $headers['cache-control'],
                 self::VALIDATION_CODE_FAIL,
-                'The header value is not correct. Excepted value "no-store".'
+                'The header value is not correct. Expected value "no-store".'
             );
             return;
         }
@@ -800,9 +819,9 @@ class PayIDValidator {
     /**
      * Method to return if validation has occured
      */
-    public function hasValidationOccured(): bool
+    public function hasValidationOccurred(): bool
     {
-        return $this->hasValidationOccured;
+        return $this->hasValidationOccurred;
     }
 
     /**
@@ -810,7 +829,7 @@ class PayIDValidator {
      */
     public function getValidationScore(): float
     {
-        if (!$this->hasValidationOccured()) {
+        if (!$this->hasValidationOccurred()) {
             return 0.0;
         }
 

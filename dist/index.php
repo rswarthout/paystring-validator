@@ -321,7 +321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-white">
             <div class="mx-auto py-8 px-4 flex items-center justify-between">
                 <div class="flex justify-center md:order-2">
-                    <span class="text-gray-500">Did this validator help you? Consider sending me a tip @robertswarthout.</span>
+                    <span class="text-gray-500">Did this validator help you? Consider sending me a tip <a href="https://twitter.com/robertswarthout" target="_blank" class="underline">@robertswarthout</a>.</span>
                     <a href="https://twitter.com/robertswarthout" class="ml-6 text-gray-400 hover:text-gray-500">
                         <span class="sr-only">Twitter</span>
                         <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -337,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mt-0">
                     <p class="text-center text-base leading-6 text-gray-500">
-                        Licensed under MIT. Release <% RELEASE_HASH %>
+                        Licensed under MIT. Release <a href="https://github.com/rswarthout/payid-validator/commit/<% RELEASE_HASH %>" target="_blank" class="underline"><% RELEASE_HASH %></a>
                     </p>
                 </div>
             </div>

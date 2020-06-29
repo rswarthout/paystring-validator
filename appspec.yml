@@ -3,6 +3,8 @@ os: linux
 files:
   - source: dist/
     destination: /var/www/html/
+  - source: config/httpd/httpd.conf
+    destination: /etc/httpd/conf/httpd.conf
 permissions:
   - object: /var/www
     pattern: "**"
@@ -10,6 +12,12 @@ permissions:
     group: apache
     type:
       - directory
+      - file
+  - object: /etc/httpd/conf/httpd.conf
+    owner: root
+    group: root
+    mode: 644
+    type:
       - file
 hooks:
   BeforeBlockTraffic:

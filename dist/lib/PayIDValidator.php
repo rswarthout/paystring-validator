@@ -41,7 +41,7 @@ class PayIDValidator {
 
     /**
      * The predefined payment networks supported
-     * 
+     *
      * @var array
      */
     private $requestTypes = [
@@ -106,28 +106,28 @@ class PayIDValidator {
 
     /**
      * Array to hold the various errors messages
-     * 
+     *
      * @var array
      */
     private $errors = [];
 
     /**
      * Request response properties
-     * 
+     *
      * @var array
      */
     private $responseProperties = [];
 
     /**
      * Property to hold the JSON schema validator
-     * 
+     *
      * @var JsonSchema\Validator
      */
     private $jsonValidator;
 
     /**
      * Property to hold the logger
-     * 
+     *
      * @var Monolog\Logger
      */
     private $logger;
@@ -154,7 +154,7 @@ class PayIDValidator {
      *  Set's the user defined PayID and network type
      */
     public function setUserDefinedProperties(
-        string $payId, 
+        string $payId,
         string $networkType
     ) {
         $this->payId = $payId;
@@ -170,7 +170,7 @@ class PayIDValidator {
     }
 
     /**
-     *  Method to get the errors messages 
+     *  Method to get the errors messages
      */
     public function getErrors(): array
     {
@@ -180,7 +180,7 @@ class PayIDValidator {
     /**
      * Method to get the user defined PayID
      */
-    public function getPayId(): string 
+    public function getPayId(): string
     {
         return $this->payId;
     }
@@ -188,7 +188,7 @@ class PayIDValidator {
     /**
      * Method to get the user defined network type
      */
-    public function getNetworkType(): string 
+    public function getNetworkType(): string
     {
         return $this->networkType;
     }
@@ -200,7 +200,7 @@ class PayIDValidator {
     {
         preg_match(
             self::PAYID_REGEX,
-            $this->payId, 
+            $this->payId,
             $matches);
 
         if (count($matches) !== 1) {
@@ -245,7 +245,7 @@ class PayIDValidator {
     public function getRequestUrl(): string
     {
         $payIdPieces = explode('$', $this->getPayId());
-        
+
         return 'https://' . $payIdPieces[1] . '/' . $payIdPieces[0];
     }
 
@@ -261,7 +261,7 @@ class PayIDValidator {
             CURLOPT_USERAGENT => 'PayIDValidator.com / 0.1.0',
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HEADER => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_URL => $this->getRequestUrl(),
             CURLOPT_HTTPHEADER => [
                 'PayID-Version: 1.0',
@@ -272,7 +272,7 @@ class PayIDValidator {
         return $curl;
     }
 
-    /** 
+    /**
      * Method to make the request to the PayID server
      */
     public function makeRequest(): bool
@@ -294,11 +294,12 @@ class PayIDValidator {
 
         $headers = $this->parseResponseHeaders($headerStrings);
         $this->responseHeaders = $headers;
+        $headers = array_change_key_case($headers, CASE_LOWER);
 
         if ($info['http_code'] === 200) {
-            $this->checkCORSHeaders($this->responseHeaders);
-            $this->checkCacheControl($this->responseHeaders);
-            $this->checkContentType($this->responseHeaders);
+            $this->checkCORSHeaders($headers);
+            $this->checkCacheControl($headers);
+            $this->checkContentType($headers);
             $this->checkResponseTime($info['total_time']);
             $this->checkResponseBodyForValidity($body);
             $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
@@ -369,8 +370,8 @@ class PayIDValidator {
         } else {
 
             $methods = [
-                'POST', 
-                'GET', 
+                'POST',
+                'GET',
                 'OPTIONS',
             ];
 
@@ -378,13 +379,13 @@ class PayIDValidator {
             $methodValues = array_map('trim', $methodValues);
             $methodErrors = [];
             $msg = '';
-            
+
             foreach ($methods as $method) {
                 if (!in_array($method, $methodValues)) {
                     $wasFound = false;
 
                     if ($method === 'OPTIONS') {
-                        // Some hosts only return OPTIONS value when 
+                        // Some hosts only return OPTIONS value when
                         // performing a pre-flight request with an OPTIONS request.
                         $wasFound = $this->performSecondaryOptionsHeaderCheck();
 
@@ -465,7 +466,7 @@ class PayIDValidator {
             ];
 
             $exposedErrors = [];
-            
+
             foreach ($exposed as $header) {
                 if (!in_array(strtolower($header), $pieces)) {
                     $exposedErrors[] = 'Header [' . $header . '] not included.';
@@ -489,10 +490,10 @@ class PayIDValidator {
         }
     }
 
-    /** 
-     * Perform a secondary check for OPTIONS value for 
-     * the Access-Control-Allow-Methods header. Return TRUE 
-     * if found via OPTIONS request, false if not found. 
+    /**
+     * Perform a secondary check for OPTIONS value for
+     * the Access-Control-Allow-Methods header. Return TRUE
+     * if found via OPTIONS request, false if not found.
      */
     private function performSecondaryOptionsHeaderCheck(): bool
     {
@@ -504,6 +505,7 @@ class PayIDValidator {
         curl_close ($curl);
 
         $headers = $this->parseResponseHeaders($headerStrings);
+        $headers = array_change_key_case($headers, CASE_LOWER);
 
         if (!isset($headers['access-control-allow-methods'])) {
             return false;
@@ -531,7 +533,7 @@ class PayIDValidator {
             return;
         }
 
-        if ($headers['cache-control'] != 'no-store') {
+        if (strpos($headers['cache-control'], 'no-store') === false) {
             $this->setResponseProperty(
                 'Header Check / Cache-Control',
                 $headers['cache-control'],
@@ -547,7 +549,7 @@ class PayIDValidator {
             self::VALIDATION_CODE_PASS
         );
     }
-    
+
     /**
      * Method to do the check the content type header returned
      */
@@ -564,8 +566,8 @@ class PayIDValidator {
         }
 
         preg_match(
-                '/application\/[\w\-]*[\+]*json/i', 
-                $headers['content-type'], 
+                '/application\/[\w\-]*[\+]*json/i',
+                $headers['content-type'],
                 $headerPieces
         );
 
@@ -625,7 +627,7 @@ class PayIDValidator {
                 $msg = $validationErrors;
             } else {
                 $code = self::VALIDATION_CODE_PASS;
-                $msg = 'The response body is valid JSON.';  
+                $msg = 'The response body is valid JSON.';
             }
         } else {
             // Considering we know this is not valid JSON we are protecting the user here.
@@ -641,7 +643,7 @@ class PayIDValidator {
     }
 
     /**
-     * Method to check that the requested network type matches the response 
+     * Method to check that the requested network type matches the response
      */
     private function checkResponseBodyForNetworkAndEnvironmentCorrectness(string $body)
     {
@@ -676,7 +678,7 @@ class PayIDValidator {
                     if (strtolower($address->paymentNetwork) !== strtolower($network)) {
                         $errors[] = 'The paymentNetwork does not match with request header.';
                     }
-    
+
                     if (isset($address->environment) && strtolower($address->environment) !== strtolower($environment)) {
                         $errors[] = 'The environment does not match with request header.';
                     }
@@ -687,7 +689,7 @@ class PayIDValidator {
                 $code = self::VALIDATION_CODE_FAIL;
                 $msg = $errors;
             } else {
-                $code = self::VALIDATION_CODE_PASS; 
+                $code = self::VALIDATION_CODE_PASS;
             }
         }
 
@@ -714,7 +716,7 @@ class PayIDValidator {
 
         if (isset($json->addresses)) {
             foreach ($json->addresses as $i => $address) {
-                $validationErrors = 
+                $validationErrors =
                     $this->validateJsonAddressObject($address, $validationErrors);
             }
         }
@@ -726,7 +728,7 @@ class PayIDValidator {
      * Method to validate the JSON Address object from the response
      */
     private function validateJsonAddressObject(
-        stdClass $address, 
+        stdClass $address,
         array $validationErrors
     ): array {
 
@@ -743,7 +745,7 @@ class PayIDValidator {
                     'ach-address-details.json',
                     $validationErrors
                 );
-            } else if ($address->addressDetailsType === self::ADDRESS_DETAILS_TYPE_CRYPTO) { 
+            } else if ($address->addressDetailsType === self::ADDRESS_DETAILS_TYPE_CRYPTO) {
                 $validationErrors = $this->validateJsonSchema(
                     $address->addressDetails,
                     'crypto-address-details.json',
@@ -754,19 +756,19 @@ class PayIDValidator {
 
         return $validationErrors;
     }
-    
+
     /**
      * Method to validate a given JSON schema against object
      */
     private function validateJsonSchema(
         stdClass $object,
-        string $schemaFile, 
+        string $schemaFile,
         array $validationErrors
     ): array {
 
         $validator = $this->getJsonValidator();
         $validator->validate(
-            $object, 
+            $object,
             [
                 '$ref' => 'file://' . realpath('./schemas/' . $schemaFile)
             ]
@@ -774,7 +776,7 @@ class PayIDValidator {
 
         if (!$validator->isValid()) {
             foreach ($validator->getErrors() as $error) {
-                $validationErrors[] = 
+                $validationErrors[] =
                     sprintf("[%s] %s", $error['property'], $error['message']);
             }
         }
@@ -786,9 +788,9 @@ class PayIDValidator {
      * Method to add properties to the response rules stack
      */
     private function setResponseProperty(
-        string $label, 
-        string $value, 
-        string $code, 
+        string $label,
+        string $value,
+        string $code,
         $msg = null
     ) {
         $this->responseProperties[] = [
@@ -800,7 +802,7 @@ class PayIDValidator {
 
         if ($this->debugMode) {
             $this->logger->info(
-                strtolower($label), 
+                strtolower($label),
                 [
                     'value' => $value,
                     'code' => $code,
@@ -879,17 +881,17 @@ class PayIDValidator {
     private function parseResponseHeaders(string $headersString): array
     {
         $headers = [];
-        
+
         $headerStrings = explode("\n", $headersString);
 
         foreach ($headerStrings as $headerString) {
             $pieces = explode(':', $headerString, 2);
-            $headers[trim($pieces[0])] = 
+            $headers[trim($pieces[0])] =
                 (isset($pieces[1]) ? trim($pieces[1]) : '');
         }
 
         return $headers;
-    } 
+    }
 
     /**
      * Method to set the logger

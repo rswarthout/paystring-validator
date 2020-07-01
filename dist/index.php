@@ -209,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 HTTP Version
                                             </dt>
                                             <dd class="mt-1 text-sm leading-5 text-gray-900">
-                                                2
+                                                1.1
                                             </dd>
                                         </div>
                                         <div class="col-span-1">
@@ -379,9 +379,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <tbody>
                                                 <?php $i = 0; ?>
                                                 <?php foreach ($payIDValidator->getResponseHeaders() as $key => $value): ?>
-                                                    <?php 
+                                                    <?php
                                                         if (trim($key) == ''):
-                                                            continue;            
+                                                            continue;
                                                         endif;
 
                                                         $i++

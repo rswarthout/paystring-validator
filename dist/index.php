@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <ul class="list-inside list-disc pl-3">
                                         <li>HTTP Status Code</li>
                                         <li>
-                                            CORS Headers
+                                            <a href="https://docs.payid.org/payid-best-practices#set-cors-cross-origin-resource-sharing-headers" target="_blank" class="underline">CORS Headers</a>
                                             <ul class="list-inside list-disc pl-3">
                                                 <li>Access-Control-Allow-Origin</li>
                                                 <li>Access-Control-Allow-Methods</li>
@@ -167,8 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <li>Content-Type header check</li>
                                         <li>Cache-Control header check</li>
                                         <li>Response Time</li>
-                                        <li>JSON Schema Validation of response body</li>
-                                        <li>Validation of Address to Content-Type header</li>
+                                        <li>JSON <a href="https://docs.payid.org/payid-interfaces" target="_blank" class="underline">Schema Validation</a> of response body</li>
+                                        <li>Validation of Address to <a href="https://docs.payid.org/payid-headers#request-headers" target="_blank" class="underline">Accept</a> header</li>
                                     </ul>
                                 </div>
                             </div>

@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 
+use Aws\SecretsManager\SecretsManagerClient;
 use Monolog\ErrorHandler;
 use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
@@ -36,6 +37,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if (!$payIDValidator->hasPreflightErrors()) {
+
+        // This is hacky. The dev environment is not hosted on AWS.
+        if (getenv('PAYID_ENVIRONMENT') === 'production') {
+            $client = new SecretsManagerClient();
+            $result = $client->getSecretValue([
+                'SecretId' => 'etherscan',
+            ]);
+            $payIDValidator->setEtherscanApiKey($result['SecretString']);
+        } else {
+            $payIDValidator->setEtherscanApiKey('YourApiKeyToken');
+        }
+
         $payIDValidator->makeRequest();
     }
 }

@@ -133,6 +133,13 @@ class PayIDValidator {
     private $logger;
 
     /**
+     * Property to hold the API key for Etherscan.io
+     *
+     * @var string
+     */
+    private $etherscanApiKey;
+
+    /**
      * Property to hold the state of debugMode
      */
     private $debugMode = false;
@@ -717,7 +724,7 @@ class PayIDValidator {
         if (isset($json->addresses)) {
             foreach ($json->addresses as $i => $address) {
                 $validationErrors =
-                    $this->validateJsonAddressObject($address, $validationErrors);
+                    $this->validateJsonAddressObject($i, $address, $validationErrors);
             }
         }
 
@@ -728,6 +735,7 @@ class PayIDValidator {
      * Method to validate the JSON Address object from the response
      */
     private function validateJsonAddressObject(
+        int $index,
         stdClass $address,
         array $validationErrors
     ): array {
@@ -750,6 +758,13 @@ class PayIDValidator {
                     $address->addressDetails,
                     'crypto-address-details.json',
                     $validationErrors
+                );
+
+                $this->validateCryptoAddress(
+                    $index,
+                    $address->paymentNetwork,
+                    $address->environment,
+                    $address->addressDetails->address
                 );
             }
         }
@@ -782,6 +797,219 @@ class PayIDValidator {
         }
 
         return $validationErrors;
+    }
+
+    /**
+     * Method to decide if a lookup of the crypto address to validate it exists can be performed
+     */
+    private function validateCryptoAddress(
+        int $index,
+        string $network,
+        string $environment,
+        string $address
+    ) {
+        if (strtolower($network) === 'btc') {
+            $this->validateBtcAddress(
+                $index,
+                $address
+            );
+        } elseif (strtolower($network) === 'eth') {
+            $this->validateEthAddress(
+                $index,
+                $environment,
+                $address
+            );
+        } elseif (strtolower($network) === 'xrpl') {
+            $this->validateXrpAddress(
+                $index,
+                $environment,
+                $address
+            );
+        }
+    }
+
+    /**
+     * Method to do a lookup on the BTC network to see if an address is valid
+     */
+    private function validateBtcAddress(
+        int $index,
+        string $address
+    ) {
+        $client = new GuzzleHttp\Client();
+        $response = $client->request(
+            'GET',
+            'https://blockchain.info/q/addressbalance/' . $address,
+            [
+                'connect_timeout' => 2,
+                'headers' => [
+                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                ],
+                'http_errors' => false,
+                'timeout' => 5,
+                'version' => 2.0,
+            ]
+        );
+
+        if ($response->getStatusCode() === 200) {
+
+            $body = $response->getBody();
+
+            $this->setResponseProperty(
+                'Address[' . $index . '] verification',
+                $address,
+                self::VALIDATION_CODE_PASS,
+                "The address was validated with the network. Current balance: " . $body
+            );
+        } else {
+            $this->setResponseProperty(
+                'Address[' . $index . '] verification',
+                $address,
+                self::VALIDATION_CODE_FAIL,
+                'The network could not find the given address.'
+            );
+        }
+    }
+
+    /**
+     * Method to do a lookup on the ETH network to see if an address is valid
+     */
+    private function validateEthAddress(
+        int $index,
+        string $environment,
+        string $address
+    ) {
+        $client = new GuzzleHttp\Client();
+        $response = $client->request(
+            'GET',
+            'https://api.etherscan.io/api',
+            [
+                'connect_timeout' => 2,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                ],
+                'http_errors' => false,
+                'query' => [
+                    'module' => 'account',
+                    'action' => 'balance',
+                    'address' => $address,
+                    'tag' => 'latest',
+                    'apikey' => $this->etherscanApiKey,
+                ],
+                'timeout' => 5,
+                'version' => 2.0,
+            ]
+        );
+
+        $json = json_decode($response->getBody());
+
+        if ($response->getStatusCode() !== 200
+            || !$json
+            || $json->status === "0"
+        ) {
+            $this->setResponseProperty(
+                'Address[' . $index . '] verification',
+                $address,
+                self::VALIDATION_CODE_FAIL,
+                'The network could not find the given address.'
+            );
+
+            return;
+        }
+
+        $balance = $json->result;
+
+        $this->setResponseProperty(
+            'Address[' . $index . '] verification',
+            $address,
+            self::VALIDATION_CODE_PASS,
+            "The address was validated with the network. Current balance: " . $balance
+        );
+    }
+
+    /**
+     * Method to do a lookup on the XRPL to check if an address is valid
+     */
+    private function validateXrpAddress(
+        int $index,
+        string $environment,
+        string $address
+    ) {
+        $hostname = null;
+
+        if (strtolower($environment) === 'mainnet') {
+            $hostname = 'https://s1.ripple.com:51234';
+        } elseif (strtolower($environment) === 'testnet') {
+            $hostname = 'https://s.altnet.rippletest.net:51234';
+        } elseif (strtolower($environment) === 'devnet') {
+            $hostname = 'https://s.devnet.rippletest.net:51234';
+        }
+
+        // If we have an encoded address let's get the parts to get the underlying account address
+        if (substr($address, 0, 1) === 'X') {
+            $addressParts = $this->getDecodedXAddressParts($address);
+            $address = $addressParts['account'];
+        }
+
+        $client = new GuzzleHttp\Client();
+        $response = $client->request(
+            'POST',
+            $hostname,
+            [
+                'connect_timeout' => 2,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                ],
+                'http_errors' => false,
+                'json' => [
+                    'method' => 'account_info',
+                    'params' => [
+                        [
+                            'account' => $address,
+                        ]
+                    ]
+                ],
+                'timeout' => 5,
+                'version' => 2.0,
+            ]
+        );
+
+        $json = json_decode($response->getBody());
+
+        if (isset($json->result->error) && $json->result->error === 'actNotFound') {
+            $this->setResponseProperty(
+                'Address[' . $index . '] verification',
+                $address,
+                self::VALIDATION_CODE_FAIL,
+                'The network could not find the given address.'
+            );
+        } elseif (isset($json->result->account_data)
+            && $json->result->account_data->Account === $address
+        ) {
+            $this->setResponseProperty(
+                'Address[' . $index . '] verification',
+                $address,
+                self::VALIDATION_CODE_PASS,
+                "The address was validated with the network. Current balance: " . $json->result->account_data->Balance
+            );
+        }
+    }
+
+    /**
+     * Method to return the parts of an encoded X address
+     */
+    private function getDecodedXAddressParts($xAddress): array
+    {
+        $client = new GuzzleHttp\Client();
+        $response = $client->request(
+            'GET',
+            'https://xrpaddress.info/api/decode/' . $xAddress
+        );
+
+        $json = json_decode($response->getBody(), true);
+
+        return $json;
     }
 
     /**
@@ -889,5 +1117,13 @@ class PayIDValidator {
     public function getResponseHeaders(): array
     {
         return $this->response->getHeaders();
+    }
+
+    /**
+     * Method to set the API key for Etherscan.io
+     */
+    public function setEtherscanApiKey(string $apiKey)
+    {
+        $this->etherscanApiKey = $apiKey;
     }
 }

@@ -209,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 HTTP Version
                                             </dt>
                                             <dd class="mt-1 text-sm leading-5 text-gray-900">
-                                                1.1
+                                                2.0
                                             </dd>
                                         </div>
                                         <div class="col-span-1">
@@ -391,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <?php echo htmlentities(trim($key)); ?>
                                                         </td>
                                                         <td class="px-3 py-4 text-sm leading-5 text-gray-500">
-                                                            <?php echo htmlentities(trim($value)); ?>
+                                                            <?php echo htmlentities(trim(implode(', ', $value))); ?>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>

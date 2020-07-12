@@ -138,9 +138,11 @@ class PayIDValidator {
     private $debugMode = false;
 
     /**
-     * Property to hold the response headers
+     * Property to hold the Guzzle response object
+     *
+     * @var GuzzleHttp\Psr7\Response
      */
-    private $responseHeaders = [];
+    private $response;
 
     /**
      * Public constructor
@@ -250,29 +252,6 @@ class PayIDValidator {
     }
 
     /**
-     * Method to return the CURL client
-     */
-    private function getCurlClient()
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_USERAGENT => 'PayIDValidator.com / 0.1.0',
-            CURLOPT_TIMEOUT => 10,
-            CURLOPT_HEADER => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_URL => $this->getRequestUrl(),
-            CURLOPT_HTTPHEADER => [
-                'PayID-Version: 1.0',
-                'Accept: ' . $this->requestTypes[$this->networkType]['header'],
-            ],
-        ]);
-
-        return $curl;
-    }
-
-    /**
      * Method to make the request to the PayID server
      */
     public function makeRequest(): bool
@@ -281,28 +260,34 @@ class PayIDValidator {
             $this->logger->info('validation started');
         }
 
-        $curl = $this->getCurlClient();
-        $response = curl_exec($curl);
-        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        $headerStrings = substr($response, 0, $headerSize);
-        $body = substr($response, $headerSize);
+        $client = new GuzzleHttp\Client();
+        $this->response = $client->request(
+            'GET',
+            $this->getRequestUrl(),
+            [
+                'connect_timeout' => 5,
+                'headers' => [
+                    'Accept' => $this->requestTypes[$this->networkType]['header'],
+                    'PayID-Version' => '1.0',
+                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                ],
+                'http_errors' => false,
+                'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
+                    $this->checkResponseTime($stats->getTransferTime());
+                 },
+                'timeout' => 10,
+                'version' => 2.0,
+            ]
+        );
 
-        $info = curl_getinfo($curl);
-        curl_close ($curl);
+        $this->checkStatusCode();
 
-        $this->checkStatusCode($info['http_code']);
-
-        $headers = $this->parseResponseHeaders($headerStrings);
-        $this->responseHeaders = $headers;
-        $headers = array_change_key_case($headers, CASE_LOWER);
-
-        if ($info['http_code'] === 200) {
-            $this->checkCORSHeaders($headers);
-            $this->checkCacheControl($headers);
-            $this->checkContentType($headers);
-            $this->checkResponseTime($info['total_time']);
-            $this->checkResponseBodyForValidity($body);
-            $this->checkResponseBodyForNetworkAndEnvironmentCorrectness($body);
+        if ($this->response->getStatusCode() === 200) {
+            $this->checkCORSHeaders();
+            $this->checkCacheControl();
+            $this->checkContentType();
+            $this->checkResponseBodyForValidity();
+            $this->checkResponseBodyForNetworkAndEnvironmentCorrectness();
         }
 
         $this->hasValidationOccurred = true;
@@ -313,9 +298,10 @@ class PayIDValidator {
     /**
      * Method to do the check on the status code
      */
-    private function checkStatusCode(int $statusCode)
+    private function checkStatusCode()
     {
         $code = self::VALIDATION_CODE_FAIL;
+        $statusCode = $this->response->getStatusCode();
 
         if ($statusCode === 200) {
             $code = self::VALIDATION_CODE_PASS;
@@ -333,34 +319,33 @@ class PayIDValidator {
     /**
      * Method to check for CORS headers
      */
-    private function checkCORSHeaders(array $headers)
+    private function checkCORSHeaders()
     {
-        // format the header keys into lowercase
-        $headers = array_change_key_case($headers, CASE_LOWER);
+        $headerValue = $this->response->getHeaderLine('access-control-allow-origin');
 
-        if (!isset($headers['access-control-allow-origin'])) {
+        if (!$this->response->hasHeader('access-control-allow-origin')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Origin',
                 '',
                 self::VALIDATION_CODE_FAIL,
                 'The header could not be located in the response.'
             );
-        } elseif ($headers['access-control-allow-origin'] != '*') {
+        } elseif ($headerValue != '*') {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Origin',
-                $headers['access-control-allow-origin'],
+                $headerValue,
                 self::VALIDATION_CODE_FAIL,
                 'The header has an incorrect value.'
             );
         } else {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Origin',
-                $headers['access-control-allow-origin'],
+                $headerValue,
                 self::VALIDATION_CODE_PASS
             );
         }
 
-        if (!isset($headers['access-control-allow-methods'])) {
+        if (!$this->response->hasHeader('access-control-allow-methods')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Methods',
                 '',
@@ -375,7 +360,8 @@ class PayIDValidator {
                 'OPTIONS',
             ];
 
-            $methodValues = explode(',', $headers['access-control-allow-methods']);
+            $headerValue = $this->response->getHeaderLine('access-control-allow-methods');
+            $methodValues = explode(',', $headerValue);
             $methodValues = array_map('trim', $methodValues);
             $methodErrors = [];
             $msg = '';
@@ -403,7 +389,7 @@ class PayIDValidator {
             if (count($methodErrors)) {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Allow-Methods',
-                    $headers['access-control-allow-methods'],
+                    $headerValue,
                     self::VALIDATION_CODE_FAIL,
                     implode(' ', $methodErrors),
                     $msg
@@ -411,14 +397,14 @@ class PayIDValidator {
             } else {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Allow-Methods',
-                    $headers['access-control-allow-methods'],
+                    $headerValue,
                     self::VALIDATION_CODE_PASS,
                     $msg
                 );
             }
         }
 
-        if (!isset($headers['access-control-allow-headers'])) {
+        if (!$this->response->hasHeader('access-control-allow-headers')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Headers',
                 '',
@@ -427,27 +413,28 @@ class PayIDValidator {
             );
         } else {
 
-            $pieces = explode(',', $headers['access-control-allow-headers']);
+            $headerValue = $this->response->getHeaderLine('access-control-allow-headers');
+            $pieces = explode(',', $headerValue);
             $pieces = array_map('trim', $pieces);
             $pieces = array_map('strtolower', $pieces);
 
             if (!in_array('payid-version', $pieces)) {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Allow-Headers',
-                    $headers['access-control-allow-headers'],
+                    $headerValue,
                     self::VALIDATION_CODE_FAIL,
                     'The [PayID-Version] header was not specified.'
                 );
             } else {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Allow-Headers',
-                    $headers['access-control-allow-headers'],
+                    $headerValue,
                     self::VALIDATION_CODE_PASS
                 );
             }
         }
 
-        if (!isset($headers['access-control-expose-headers'])) {
+        if (!$this->response->hasHeader('access-control-expose-headers')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Expose-Headers',
                 '',
@@ -456,7 +443,8 @@ class PayIDValidator {
             );
         } else {
 
-            $pieces = explode(',', $headers['access-control-expose-headers']);
+            $headerValue = $this->response->getHeaderLine('access-control-expose-headers');
+            $pieces = explode(',', $headerValue);
             $pieces = array_map('trim', $pieces);
             $pieces = array_map('strtolower', $pieces);
 
@@ -476,14 +464,14 @@ class PayIDValidator {
             if (count($exposedErrors)) {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Expose-Headers',
-                    $headers['access-control-expose-headers'],
+                    $headerValue,
                     self::VALIDATION_CODE_FAIL,
                     implode(' ', $exposedErrors)
                 );
             } else {
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Expose-Headers',
-                    $headers['access-control-expose-headers'],
+                    $headerValue,
                     self::VALIDATION_CODE_PASS
                 );
             }
@@ -497,21 +485,28 @@ class PayIDValidator {
      */
     private function performSecondaryOptionsHeaderCheck(): bool
     {
-        $curl = $this->getCurlClient();
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'OPTIONS');
-        $response = curl_exec($curl);
-        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        $headerStrings = substr($response, 0, $headerSize);
-        curl_close ($curl);
+        $client = new GuzzleHttp\Client();
+        $response = $client->request(
+            'OPTIONS',
+            $this->getRequestUrl(),
+            [
+                'connect_timeout' => 5,
+                'headers' => [
+                    'Accept' => $this->requestTypes[$this->networkType]['header'],
+                    'PayID-Version' => '1.0',
+                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                ],
+                'http_errors' => false,
+                'timeout' => 10,
+                'version' => 2.0,
+            ]
+        );
 
-        $headers = $this->parseResponseHeaders($headerStrings);
-        $headers = array_change_key_case($headers, CASE_LOWER);
-
-        if (!isset($headers['access-control-allow-methods'])) {
+        if (!$response->hasHeader('access-control-allow-methods')) {
             return false;
         }
 
-        if (stripos($headers['access-control-allow-methods'], 'OPTIONS') !== false) {
+        if (stripos($response->getHeaderLine('access-control-allow-methods'), 'OPTIONS') !== false) {
             return true;
         }
 
@@ -521,9 +516,9 @@ class PayIDValidator {
     /**
      * Method to check for a valid Cache-Control header
      */
-    private function checkCacheControl(array $headers)
+    private function checkCacheControl()
     {
-        if (!isset($headers['cache-control'])) {
+        if (!$this->response->hasHeader('cache-control')) {
             $this->setResponseProperty(
                 'Header Check / Cache-Control',
                 '',
@@ -533,10 +528,12 @@ class PayIDValidator {
             return;
         }
 
-        if (strpos($headers['cache-control'], 'no-store') === false) {
+        $headerValue = $this->response->getHeaderLine('cache-control');
+
+        if (strpos($headerValue, 'no-store') === false) {
             $this->setResponseProperty(
                 'Header Check / Cache-Control',
-                $headers['cache-control'],
+                $headerValue,
                 self::VALIDATION_CODE_FAIL,
                 'The header value is not correct. Expected value "no-store".'
             );
@@ -545,7 +542,7 @@ class PayIDValidator {
 
         $this->setResponseProperty(
             'Header Check / Cache-Control',
-            $headers['cache-control'],
+            $headerValue,
             self::VALIDATION_CODE_PASS
         );
     }
@@ -553,9 +550,9 @@ class PayIDValidator {
     /**
      * Method to do the check the content type header returned
      */
-    private function checkContentType(array $headers)
+    private function checkContentType()
     {
-        if (!isset($headers['content-type'])) {
+        if (!$this->response->hasHeader('content-type')) {
             $this->setResponseProperty(
                 'Header Check / Content-Type',
                 '',
@@ -565,16 +562,17 @@ class PayIDValidator {
             return;
         }
 
+        $headerValue = $this->response->getHeaderLine('content-type');
         preg_match(
                 '/application\/[\w\-]*[\+]*json/i',
-                $headers['content-type'],
+                $headerValue,
                 $headerPieces
         );
 
         if (count($headerPieces)) {
             $this->setResponseProperty(
                 'Content Type',
-                $headers['content-type'],
+                $headerValue,
                 self::VALIDATION_CODE_PASS
             );
             return;
@@ -582,7 +580,7 @@ class PayIDValidator {
 
         $this->setResponseProperty(
             'Content Type',
-            ((strlen($headers['content-type'])) ? $headers['content-type']: ''),
+            ((strlen($headerValue)) ? $headerValue: ''),
             self::VALIDATION_CODE_FAIL,
             'The value of [application/json] or other variants could not be found.'
         );
@@ -612,8 +610,9 @@ class PayIDValidator {
     /**
      * Method to do validation checks on the response body
      */
-    private function checkResponseBodyForValidity(string $body)
+    private function checkResponseBodyForValidity()
     {
+        $body = $this->response->getBody();
         $code = self::VALIDATION_CODE_FAIL;
         $msg = 'The response body is NOT valid JSON.';
         $json = json_decode($body);
@@ -645,8 +644,9 @@ class PayIDValidator {
     /**
      * Method to check that the requested network type matches the response
      */
-    private function checkResponseBodyForNetworkAndEnvironmentCorrectness(string $body)
+    private function checkResponseBodyForNetworkAndEnvironmentCorrectness()
     {
+        $body = $this->response->getBody();
         $json = json_decode($body);
         $code = self::VALIDATION_CODE_FAIL;
         $msg = '';
@@ -876,24 +876,6 @@ class PayIDValidator {
     }
 
     /**
-     * Method to parse a string of headers
-     */
-    private function parseResponseHeaders(string $headersString): array
-    {
-        $headers = [];
-
-        $headerStrings = explode("\n", $headersString);
-
-        foreach ($headerStrings as $headerString) {
-            $pieces = explode(':', $headerString, 2);
-            $headers[trim($pieces[0])] =
-                (isset($pieces[1]) ? trim($pieces[1]) : '');
-        }
-
-        return $headers;
-    }
-
-    /**
      * Method to set the logger
      */
     public function setLogger(Monolog\Logger $logger)
@@ -906,6 +888,6 @@ class PayIDValidator {
      */
     public function getResponseHeaders(): array
     {
-        return $this->responseHeaders;
+        return $this->response->getHeaders();
     }
 }

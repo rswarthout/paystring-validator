@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // This is hacky. The dev environment is not hosted on AWS.
         if (getenv('PAYID_ENVIRONMENT') === 'production') {
             $client = new SecretsManagerClient([
-                'region' => 'us-east-1',
+                'region' => getenv('AWS_REGION'),
                 'version' => 'latest',
             ]);
             $result = $client->getSecretValue([

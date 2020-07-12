@@ -17,9 +17,9 @@ class PayIDValidator {
     const NETWORK_ETH_KOVAN = 'eth-kovan';
     const NETWORK_ETH_RINKEBY = 'eth-rinkeby';
 
-    const NETWORK_XRP_MAINNET = 'xrp-mainnet';
-    const NETWORK_XRP_TESTNET = 'xrp-testnet';
-    const NETWORK_XRP_DEVNET = 'xrp-devnet';
+    const NETWORK_XRP_MAINNET = 'xrpl-mainnet';
+    const NETWORK_XRP_TESTNET = 'xrpl-testnet';
+    const NETWORK_XRP_DEVNET = 'xrpl-devnet';
 
     /**
      * AddressDetailsType values
@@ -48,38 +48,47 @@ class PayIDValidator {
         self::NETWORK_BTC_MAINNET => [
             'label' => 'BTC (mainnet)',
             'header' => 'application/btc-mainnet+json',
+            'hostname' => 'https://blockchain.info'
         ],
         self::NETWORK_BTC_TESTNET => [
             'label' => 'BTC (testnet)',
             'header' => 'application/btc-testnet+json',
+            'hostname' => 'https://testnet.blockchain.info',
         ],
         self::NETWORK_ETH_MAINNET => [
             'label' => 'ETH (mainnet)',
             'header' => 'application/eth-mainnet+json',
+            'hostname' => 'https://api.etherscan.io',
         ],
         self::NETWORK_ETH_ROPSTEN => [
             'label' => 'ETH (ropsten)',
             'header' => 'application/eth-ropsten+json',
+            'hostname' => 'https://api-ropsten.etherscan.io',
         ],
         self::NETWORK_ETH_KOVAN => [
             'label' => 'ETH (kovan)',
             'header' => 'application/eth-kovan+json',
+            'hostname' => 'https://api-kovan.etherscan.io',
         ],
         self::NETWORK_ETH_RINKEBY => [
             'label' => 'ETH (rinkeby)',
             'header' => 'application/eth-rinkeby+json',
+            'hostname' => 'https://api-rinkkeby.etherscan.io',
         ],
         self::NETWORK_XRP_MAINNET => [
             'label' => 'XRP (mainnet)',
             'header' => 'application/xrpl-mainnet+json',
+            'hostname' => 'https://s1.ripple.com:51234',
         ],
         self::NETWORK_XRP_TESTNET => [
             'label' => 'XRP (testnet)',
             'header' => 'application/xrpl-testnet+json',
+            'hostname' => 'https://s.altnet.rippletest.net:51234',
         ],
         self::NETWORK_XRP_DEVNET => [
             'label' => 'XRP (devnet)',
             'header' => 'application/xrpl-devnet+json',
+            'hostname' => 'https://s.devnet.rippletest.net:51234',
         ],
         self::NETWORK_ACH => [
             'label' => 'ACH',
@@ -811,17 +820,21 @@ class PayIDValidator {
         if (strtolower($network) === 'btc') {
             $this->validateBtcAddress(
                 $index,
+                $network,
+                $environment,
                 $address
             );
         } elseif (strtolower($network) === 'eth') {
             $this->validateEthAddress(
                 $index,
+                $network,
                 $environment,
                 $address
             );
         } elseif (strtolower($network) === 'xrpl') {
             $this->validateXrpAddress(
                 $index,
+                $network,
                 $environment,
                 $address
             );
@@ -833,12 +846,17 @@ class PayIDValidator {
      */
     private function validateBtcAddress(
         int $index,
+        string $network,
+        string $environment,
         string $address
     ) {
+        $hostname =
+            $this->requestTypes[strtolower($network . '-' . $environment)]['hostname'];
+
         $client = new GuzzleHttp\Client();
         $response = $client->request(
             'GET',
-            'https://blockchain.info/q/addressbalance/' . $address,
+            $hostname . '/q/addressbalance/' . $address,
             [
                 'connect_timeout' => 2,
                 'headers' => [
@@ -875,13 +893,17 @@ class PayIDValidator {
      */
     private function validateEthAddress(
         int $index,
+        string $network,
         string $environment,
         string $address
     ) {
+        $hostname =
+            $this->requestTypes[strtolower($network . '-' . $environment)]['hostname'];
+
         $client = new GuzzleHttp\Client();
         $response = $client->request(
             'GET',
-            'https://api.etherscan.io/api',
+            $hostname . '/api',
             [
                 'connect_timeout' => 2,
                 'headers' => [
@@ -932,18 +954,12 @@ class PayIDValidator {
      */
     private function validateXrpAddress(
         int $index,
+        string $network,
         string $environment,
         string $address
     ) {
-        $hostname = null;
-
-        if (strtolower($environment) === 'mainnet') {
-            $hostname = 'https://s1.ripple.com:51234';
-        } elseif (strtolower($environment) === 'testnet') {
-            $hostname = 'https://s.altnet.rippletest.net:51234';
-        } elseif (strtolower($environment) === 'devnet') {
-            $hostname = 'https://s.devnet.rippletest.net:51234';
-        }
+        $hostname =
+            $this->requestTypes[strtolower($network . '-' . $environment)]['hostname'];
 
         // If we have an encoded address let's get the parts to get the underlying account address
         if (substr($address, 0, 1) === 'X') {

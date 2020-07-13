@@ -871,7 +871,7 @@ class PayIDValidator {
                 ],
                 'http_errors' => false,
                 'query' => [
-                    'api_key' => $this->blockchainApiKey,
+                    'api_code' => $this->blockchainApiKey,
                 ],
                 'timeout' => 5,
                 'version' => 2.0,

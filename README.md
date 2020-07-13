@@ -4,7 +4,7 @@ A web app that validates PayID server responses. The intent is to help developer
 ## Requirements
 - To compile CSS you will need `npm`.
 - PHP 7.0+
-- To pull in PHP libraries you will need `composer` available. 
+- To pull in PHP libraries you will need `composer` available.
 
 ## List of Current Validation/Checks Performed
 - HTTP Status Code
@@ -18,3 +18,4 @@ A web app that validates PayID server responses. The intent is to help developer
 - Response Time
 - JSON [Schema Validation](https://docs.payid.org/payid-interfaces) of response body
 - Validation of Address to [Accept](https://docs.payid.org/payid-headers#request-headers) header
+- Cross-check that each crypto address returned is valid on the given network/environment.

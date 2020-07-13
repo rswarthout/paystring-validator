@@ -185,6 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <li>Response Time</li>
                                         <li>JSON <a href="https://docs.payid.org/payid-interfaces" target="_blank" class="underline">Schema Validation</a> of response body</li>
                                         <li>Validation of Address to <a href="https://docs.payid.org/payid-headers#request-headers" target="_blank" class="underline">Accept</a> header</li>
+                                        <li>Cross-check that each crypto address returned is valid on the given network/environment.</li>
                                     </ul>
                                 </div>
                             </div>

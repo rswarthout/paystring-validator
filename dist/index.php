@@ -44,12 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'region' => getenv('AWS_REGION'),
                 'version' => 'latest',
             ]);
+
+            // Get the Etherscan.io API key
             $result = $client->getSecretValue([
                 'SecretId' => 'etherscan',
             ]);
             $payIDValidator->setEtherscanApiKey($result['SecretString']);
+
+            // Get the Blockchain.com API Key
+            $result = $client->getSecretValue([
+                'SecretId' => 'blockchain',
+            ]);
+            $payIDValidator->setBlockchainApiKey($result['SecretString']);
+
         } else {
             $payIDValidator->setEtherscanApiKey('YourApiKeyToken');
+            $payIDValidator->setBlockchainApiKey('');
         }
 
         $payIDValidator->makeRequest();

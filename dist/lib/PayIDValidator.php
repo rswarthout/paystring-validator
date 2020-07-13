@@ -149,6 +149,13 @@ class PayIDValidator {
     private $etherscanApiKey;
 
     /**
+     * Property to hold the API key for Blockchain.com
+     *
+     * @var string
+     */
+    private $blockchainApiKey;
+
+    /**
      * Property to hold the state of debugMode
      */
     private $debugMode = false;
@@ -863,6 +870,9 @@ class PayIDValidator {
                     'User-Agent' => 'PayIDValidator.com / 0.1.0',
                 ],
                 'http_errors' => false,
+                'query' => [
+                    'api_key' => $this->blockchainApiKey,
+                ],
                 'timeout' => 5,
                 'version' => 2.0,
             ]
@@ -1141,5 +1151,13 @@ class PayIDValidator {
     public function setEtherscanApiKey(string $apiKey)
     {
         $this->etherscanApiKey = $apiKey;
+    }
+
+    /**
+     * Method to set the API key for Blockchain.com
+     */
+    public function setBlockchainApiKey(string $apiKey)
+    {
+        $this->blockchainApiKey = $apiKey;
     }
 }

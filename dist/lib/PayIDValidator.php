@@ -142,6 +142,13 @@ class PayIDValidator {
     private $logger;
 
     /**
+     * Property to hold the error message to show to the user in the event a lookup cannot be done.
+     *
+     * @var string
+     */
+    private $failError = '';
+
+    /**
      * Property to hold the API key for Etherscan.io
      *
      * @var string
@@ -283,25 +290,33 @@ class PayIDValidator {
             $this->logger->info('validation started');
         }
 
-        $client = new GuzzleHttp\Client();
-        $this->response = $client->request(
-            'GET',
-            $this->getRequestUrl(),
-            [
-                'connect_timeout' => 5,
-                'headers' => [
-                    'Accept' => $this->requestTypes[$this->networkType]['header'],
-                    'PayID-Version' => '1.0',
-                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
-                ],
-                'http_errors' => false,
-                'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
-                    $this->checkResponseTime($stats->getTransferTime());
-                 },
-                'timeout' => 10,
-                'version' => 2.0,
-            ]
-        );
+        try {
+
+            $client = new GuzzleHttp\Client();
+            $this->response = $client->request(
+                'GET',
+                $this->getRequestUrl(),
+                [
+                    'connect_timeout' => 5,
+                    'headers' => [
+                        'Accept' => $this->requestTypes[$this->networkType]['header'],
+                        'PayID-Version' => '1.0',
+                        'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                    ],
+                    'http_errors' => false,
+                    'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
+                        $this->checkResponseTime($stats->getTransferTime());
+                     },
+                    'timeout' => 10,
+                    'version' => 2.0,
+                ]
+            );
+
+        } catch (GuzzleHttp\Exception\ConnectException $exception) {
+            $this->logger->critical($exception);
+            $this->failError = $exception->getMessage();
+            return false;
+        }
 
         $this->checkStatusCode();
 
@@ -1159,5 +1174,13 @@ class PayIDValidator {
     public function setBlockchainApiKey(string $apiKey)
     {
         $this->blockchainApiKey = $apiKey;
+    }
+
+    /**
+     * Method to get the fail error to show to the user
+     */
+    public function getFailError(): string
+    {
+        return $this->failError;
     }
 }

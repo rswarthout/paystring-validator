@@ -18,6 +18,8 @@ $appLogger->pushHandler(new ErrorLogHandler());
 $payIDValidator = new PayIDValidator(true);
 $payIDValidator->setLogger($appLogger);
 
+$success = null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $payId = trim($_POST['pay-id']);
@@ -62,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $payIDValidator->setBlockchainApiKey('');
         }
 
-        $payIDValidator->makeRequest();
+        $success = $payIDValidator->makeRequest();
     }
 }
 ?>
@@ -171,6 +173,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
                     </div>
+
+                    <?php if ($success === false): ?>
+                        <div class="flex flex-col justify-center">
+                            <div class="w-full max-w-xl mx-auto">
+                                <div class="bg-red-300 shadow mt-10 px-10 py-8 rounded-lg">
+                                    <?php echo $payIDValidator->getFailError(); ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if (!$payIDValidator->hasValidationOccurred()) : ?>
                         <div class="flex flex-col justify-center">

@@ -1,5 +1,15 @@
 <?php
 
+use Jose\Component\Core\JWK;
+use Jose\Easy\Build;
+use Jose\Component\Signature\Serializer;
+use Jose\Component\Signature\Serializer\JSONGeneralSerializer;
+use Jose\Component\Signature\Serializer\JWSSerializerManager;
+use Jose\Component\Signature\Serializer\CompactSerializer;
+use Jose\Component\Signature\Algorithm\ES512;
+use Jose\Component\Signature\JWSVerifier;
+use Jose\Component\Core\AlgorithmManager;
+
 class PayIDValidator {
 
     /**
@@ -657,6 +667,7 @@ class PayIDValidator {
 
         if ($json) {
             $validationErrors = $this->validateRootLevelJson($json);
+            $json = $this->decodeVerifiedPayload($json);
             $body = '<pre>'. str_replace("\n", "<br>", json_encode($json, JSON_PRETTY_PRINT)) . '</pre>';
 
             if (count($validationErrors)) {
@@ -756,6 +767,13 @@ class PayIDValidator {
             foreach ($json->addresses as $i => $address) {
                 $validationErrors =
                     $this->validateJsonAddressObject($i, $address, $validationErrors);
+            }
+        }
+
+        if (isset($json->verifiedAddresses)) {
+            foreach ($json->verifiedAddresses as $i => $raw_address) {
+                $validationErrors =
+                    $this->verifySignedAddress($i, $raw_address, $validationErrors);
             }
         }
 
@@ -1182,5 +1200,69 @@ class PayIDValidator {
     public function getFailError(): string
     {
         return $this->failError;
+    }
+
+
+    private function decodeVerifiedPayload(object $json) {
+        if (isset($json->verifiedAddresses)) {
+            foreach ($json->verifiedAddresses as $i => $verifiedAddress) {
+                $json->verifiedAddresses[$i]->payload = json_decode($verifiedAddress->payload);
+            }
+        }
+        return $json;
+    }
+
+    /**
+     * Method to validate a verifiedAddress signature
+     */
+    private function verifySignedAddress(
+        int $index,
+        object $verifiedAddress,
+        array $validationErrors
+    ) {
+        $manager = new JWSSerializerManager([new Serializer\CompactSerializer(), new Serializer\JSONFlattenedSerializer(), new Serializer\JSONGeneralSerializer()]);
+        $algorithmManager = new AlgorithmManager([ new ES512() ]);
+        $jwsVerifier = new JWSVerifier($algorithmManager);
+
+        try {
+            $protected = $verifiedAddress->protected;
+            $payload = $verifiedAddress->payload;
+            $signature = $verifiedAddress->signature;
+
+            $payid_address = json_decode($verifiedAddress->payload)->payid_address;
+            $validationErrors =
+                $this->validateJsonAddressObject($index, $payid_address, $validationErrors);
+
+            $jws_payload = "$protected.$payload.$signature";
+
+            $jws = $manager->unserialize($jws_payload);
+            $jwk = new JWK($jws->getSignature(0)->getProtectedHeader("jwk")["jwk"]);
+
+            $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
+            if ($isVerified) {
+                $this->setResponseProperty(
+                    'Verified address[' . $index . '] signature',
+                    $payid_address->addressDetails->address,
+                    self::VALIDATION_CODE_PASS,
+                    'Address has a valid signature'
+                );
+            } else {
+                $this->setResponseProperty(
+                    'Verified address[' . $index . '] signature',
+                    $payid_address->addressDetails->address,
+                    self::VALIDATION_CODE_FAIL,
+                    'Signature does not match address. Address has been compromised!'
+                );
+            }
+        } catch (Exception $exception) {
+            $this->setResponseProperty(
+                'Verified address[' . $index . '] signature',
+                $address,
+                self::VALIDATION_CODE_FAIL,
+                'Signature does not match address. Address has been compromised!'
+            );            
+            return false;
+        }
+        return $validationErrors;
     }
 }

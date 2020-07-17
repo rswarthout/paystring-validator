@@ -7,6 +7,7 @@ use Jose\Component\Signature\Serializer\JSONGeneralSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Algorithm\ES512;
+use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Core\AlgorithmManager;
 
@@ -667,7 +668,7 @@ class PayIDValidator {
 
         if ($json) {
             $validationErrors = $this->validateRootLevelJson($json);
-            $json = $this->decodeVerifiedPayload($json);
+            $json = $this->decodeVerifiedAddressJson($json);
             $body = '<pre>'. str_replace("\n", "<br>", json_encode($json, JSON_PRETTY_PRINT)) . '</pre>';
 
             if (count($validationErrors)) {
@@ -916,14 +917,14 @@ class PayIDValidator {
             $body = $response->getBody();
 
             $this->setResponseProperty(
-                'Address[' . $index . '] verification',
+                'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_PASS,
                 "The address was validated with the network. Current balance: " . $body
             );
         } else {
             $this->setResponseProperty(
-                'Address[' . $index . '] verification',
+                'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_FAIL,
                 'The network could not find the given address.'
@@ -973,7 +974,7 @@ class PayIDValidator {
             || $json->status === "0"
         ) {
             $this->setResponseProperty(
-                'Address[' . $index . '] verification',
+                'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_FAIL,
                 'The network could not find the given address.'
@@ -985,7 +986,7 @@ class PayIDValidator {
         $balance = $json->result;
 
         $this->setResponseProperty(
-            'Address[' . $index . '] verification',
+            'Address[' . $index . '] ledger verification',
             $address,
             self::VALIDATION_CODE_PASS,
             "The address was validated with the network. Current balance: " . $balance
@@ -1038,7 +1039,7 @@ class PayIDValidator {
 
         if (isset($json->result->error) && $json->result->error === 'actNotFound') {
             $this->setResponseProperty(
-                'Address[' . $index . '] verification',
+                'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_FAIL,
                 'The network could not find the given address.'
@@ -1047,7 +1048,7 @@ class PayIDValidator {
             && $json->result->account_data->Account === $address
         ) {
             $this->setResponseProperty(
-                'Address[' . $index . '] verification',
+                'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_PASS,
                 "The address was validated with the network. Current balance: " . $json->result->account_data->Balance
@@ -1203,10 +1204,15 @@ class PayIDValidator {
     }
 
 
-    private function decodeVerifiedPayload(object $json) {
+    private function decodeVerifiedAddressJson(object $json) {
         if (isset($json->verifiedAddresses)) {
             foreach ($json->verifiedAddresses as $i => $verifiedAddress) {
-                $json->verifiedAddresses[$i]->payload = json_decode($verifiedAddress->payload);
+                if (isset($json->verifiedAddresses[$i]->payload)) {
+                    $json->verifiedAddresses[$i]->payload = json_decode($verifiedAddress->payload);
+                }
+                if (isset($json->verifiedAddresses[$i]->protected)) {
+                    $json->verifiedAddresses[$i]->protected = json_decode(base64_decode($verifiedAddress->protected));
+                }
             }
         }
         return $json;
@@ -1241,27 +1247,26 @@ class PayIDValidator {
             $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
             if ($isVerified) {
                 $this->setResponseProperty(
-                    'Verified address[' . $index . '] signature',
+                    'Address[' . $index . '] PayID signature verification',
                     $payid_address->addressDetails->address,
                     self::VALIDATION_CODE_PASS,
-                    'Address has a valid signature'
+                    'Address has a valid signature.'
                 );
             } else {
                 $this->setResponseProperty(
-                    'Verified address[' . $index . '] signature',
+                    'Address[' . $index . '] PayID signature verification',
                     $payid_address->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'Signature does not match address. Address has been compromised!'
+                    'Signature does not match address. <b class="blink">Address may have been hacked.</b>'
                 );
             }
         } catch (Exception $exception) {
             $this->setResponseProperty(
-                'Verified address[' . $index . '] signature',
-                $address,
+                'Address[' . $index . '] PayID signature verification',
+                json_decode($verifiedAddress->payload)->payid_address->addressDetails->address,
                 self::VALIDATION_CODE_FAIL,
-                'Signature does not match address. Address has been compromised!'
+                'Invalid signature. Error: ' . $exception -> getMessage()
             );            
-            return false;
         }
         return $validationErrors;
     }

@@ -308,6 +308,7 @@ class PayIDValidator {
                         $this->checkResponseTime($stats->getTransferTime());
                      },
                     'timeout' => 10,
+                    'verify' => false,
                     'version' => 2.0,
                 ]
             );
@@ -536,6 +537,7 @@ class PayIDValidator {
                 ],
                 'http_errors' => false,
                 'timeout' => 10,
+                'verify' => false,
                 'version' => 2.0,
             ]
         );
@@ -889,6 +891,7 @@ class PayIDValidator {
                     'api_code' => $this->blockchainApiKey,
                 ],
                 'timeout' => 5,
+                'verify' => false,
                 'version' => 2.0,
             ]
         );
@@ -944,6 +947,7 @@ class PayIDValidator {
                     'apikey' => $this->etherscanApiKey,
                 ],
                 'timeout' => 5,
+                'verify' => false,
                 'version' => 2.0,
             ]
         );
@@ -1012,6 +1016,7 @@ class PayIDValidator {
                     ]
                 ],
                 'timeout' => 5,
+                'verify' => false,
                 'version' => 2.0,
             ]
         );

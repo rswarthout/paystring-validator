@@ -5,8 +5,9 @@ use Jose\Easy\Build;
 use Jose\Component\Signature\Serializer;
 use Jose\Component\Signature\Serializer\JSONGeneralSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
-use Jose\Component\Signature\Serializer\CompactSerializer;
+use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES512;
+use Jose\Component\Signature\Algorithm\RS256;
 use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Core\AlgorithmManager;
@@ -774,7 +775,7 @@ class PayIDValidator {
         if (isset($json->verifiedAddresses)) {
             foreach ($json->verifiedAddresses as $i => $raw_address) {
                 $validationErrors =
-                    $this->verifySignedAddress($i, $raw_address, $validationErrors);
+                    $this->verifySignedAddress($json->payId, $i, $raw_address, $validationErrors);
             }
         }
 
@@ -1204,14 +1205,15 @@ class PayIDValidator {
     }
 
 
+    /**
+      * The payload inside a verified address is a stringified json value which is not as friendly to view.
+      * This method parses the string into JSON if such a field exists.
+      */
     private function decodeVerifiedAddressJson(object $json) {
         if (isset($json->verifiedAddresses)) {
             foreach ($json->verifiedAddresses as $i => $verifiedAddress) {
                 if (isset($json->verifiedAddresses[$i]->payload)) {
                     $json->verifiedAddresses[$i]->payload = json_decode($verifiedAddress->payload);
-                }
-                if (isset($json->verifiedAddresses[$i]->protected)) {
-                    $json->verifiedAddresses[$i]->protected = json_decode(base64_decode($verifiedAddress->protected));
                 }
             }
         }
@@ -1222,47 +1224,66 @@ class PayIDValidator {
      * Method to validate a verifiedAddress signature
      */
     private function verifySignedAddress(
+        string $payId,
         int $index,
         object $verifiedAddress,
         array $validationErrors
     ) {
-        $manager = new JWSSerializerManager([new Serializer\CompactSerializer(), new Serializer\JSONFlattenedSerializer(), new Serializer\JSONGeneralSerializer()]);
-        $algorithmManager = new AlgorithmManager([ new ES512() ]);
+        $manager = new JWSSerializerManager([new Serializer\JSONGeneralSerializer()]);
+        // FIXME need to support all the algorithms.
+        $algorithmManager = new AlgorithmManager([ new ES256(), new ES512(), new RS256(), new RS512() ]);
         $jwsVerifier = new JWSVerifier($algorithmManager);
 
         try {
-            $protected = $verifiedAddress->protected;
-            $payload = $verifiedAddress->payload;
-            $signature = $verifiedAddress->signature;
-
-            $payid_address = json_decode($verifiedAddress->payload)->payid_address;
+            $payload = json_decode($verifiedAddress->payload);
+            $payid_address = $payload->payid_address;
             $validationErrors =
                 $this->validateJsonAddressObject($index, $payid_address, $validationErrors);
 
-            $jws_payload = "$protected.$payload.$signature";
-
-            $jws = $manager->unserialize($jws_payload);
-            $jwk = new JWK($jws->getSignature(0)->getProtectedHeader("jwk")["jwk"]);
-
-            $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
-            if ($isVerified) {
+            if (!isset($payload->sub)) {
                 $this->setResponseProperty(
-                    'Address[' . $index . '] PayID signature verification',
-                    $payid_address->addressDetails->address,
-                    self::VALIDATION_CODE_PASS,
-                    'Address has a valid signature.'
-                );
-            } else {
-                $this->setResponseProperty(
-                    'Address[' . $index . '] PayID signature verification',
+                    'Verified address[' . $index . '] PayID',
                     $payid_address->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'Signature does not match address. <b class="blink">Address may have been hacked.</b>'
+                    'payload "sub" property missing'
                 );
+            }
+            else if ($payload->sub != $payId) {
+                $this->setResponseProperty(
+                    'Verified address[' . $index . '] PayID',
+                    $payid_address->addressDetails->address,
+                    self::VALIDATION_CODE_FAIL,
+                    'payload "sub" value ' . $payload->sub . ' does not match ' . $payId
+                );
+            }
+
+            $jws = $manager->unserialize(json_encode($verifiedAddress));
+
+            foreach($jws->getSignatures() as $i => $signature) {
+                // FIXME this assumes the JWK is included in the protected headers using `jwk` property
+                // be specified as a url via the `jku` property
+                $jwk = new JWK($signature->getProtectedHeader()["jwk"]);
+
+                $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, $i);
+                if ($isVerified) {
+                    $this->setResponseProperty(
+                        'Verified address[' . $index . '] PayID signature verification',
+                        $payid_address->addressDetails->address,
+                        self::VALIDATION_CODE_PASS,
+                        'Address has a valid signature.'
+                    );
+                } else {
+                    $this->setResponseProperty(
+                        'Verified address[' . $index . '] PayID signature verification',
+                        $payid_address->addressDetails->address,
+                        self::VALIDATION_CODE_FAIL,
+                        'Signature ' . $i . ' does not match address.'
+                    );
+                }
             }
         } catch (Exception $exception) {
             $this->setResponseProperty(
-                'Address[' . $index . '] PayID signature verification',
+                'Verified address[' . $index . '] PayID signature verification',
                 json_decode($verifiedAddress->payload)->payid_address->addressDetails->address,
                 self::VALIDATION_CODE_FAIL,
                 'Invalid signature. Error: ' . $exception -> getMessage()

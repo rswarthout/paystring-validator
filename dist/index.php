@@ -15,11 +15,6 @@ ErrorHandler::register($phpLogger);
 $appLogger = new Logger('app');
 $appLogger->pushHandler(new ErrorLogHandler());
 
-function exception_error_handler($errno, $errstr, $errfile, $errline ) {
-    throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
-}
-set_error_handler("exception_error_handler");
-
 $payIDValidator = new PayIDValidator(true);
 $payIDValidator->setLogger($appLogger);
 
@@ -213,6 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <li>JSON <a href="https://docs.payid.org/payid-interfaces" target="_blank" class="underline">Schema Validation</a> of response body</li>
                                         <li>Validation of Address to <a href="https://docs.payid.org/payid-headers#request-headers" target="_blank" class="underline">Accept</a> header</li>
                                         <li>Cross-check that each crypto address returned is valid on the given network/environment.</li>
+                                        <li>Check for valid signatures when a response contains a verifiedAddresses property.</li>
                                     </ul>
                                 </div>
                             </div>

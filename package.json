@@ -19,20 +19,19 @@
   },
   "homepage": "https://github.com/rswarthout/payid-validator#readme",
   "dependencies": {
-    "@tailwindcss/ui": "^0.3.0",
     "@sparkbox/cachebust": "^0.3.0",
-    "autoprefixer": "^9.8.4",
-    "tailwindcss": "^1.4.6"
+    "@tailwindcss/ui": "^0.3.1",
+    "autoprefixer": "^9.8.5",
+    "tailwindcss": "^1.5.2"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "cachebust": {
     "source": [
-        "dist/assets/css/style.css"
+      "dist/assets/css/style.css"
     ],
     "target": [
-        "dist/*.php",
-        "dist/**/*.html"
+      "dist/*.php",
+      "dist/**/*.html"
     ]
-  } 
+  }
 }

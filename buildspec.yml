@@ -8,14 +8,14 @@ phases:
   install:
     runtime-versions:
       nodejs: 10
-      php: 7.2
+      php: 7.3
     commands:
       # Install composer
       - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
       - php composer-setup.php
       - php -r "unlink('composer-setup.php');"
       - mv composer.phar /usr/local/bin/composer
-      - PYTHON=python2 amazon-linux-extras enable php7.2
+      - PYTHON=python2 amazon-linux-extras enable php7.3
       - yum -y install php-gmp
       - yum -y install php-mbstring
   build:

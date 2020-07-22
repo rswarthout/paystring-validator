@@ -15,6 +15,11 @@ ErrorHandler::register($phpLogger);
 $appLogger = new Logger('app');
 $appLogger->pushHandler(new ErrorLogHandler());
 
+function exception_error_handler($errno, $errstr, $errfile, $errline ) {
+    throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+}
+set_error_handler("exception_error_handler");
+
 $payIDValidator = new PayIDValidator(true);
 $payIDValidator->setLogger($appLogger);
 

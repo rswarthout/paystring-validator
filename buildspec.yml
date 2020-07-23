@@ -13,6 +13,7 @@ phases:
       - PYTHON=python2 amazon-linux-extras enable php7.4
       - yum -y install php-gmp
       - yum -y install php-mbstring
+      - yum -y update
       # Install composer
       - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
       - php composer-setup.php

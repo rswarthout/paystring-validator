@@ -15,10 +15,10 @@ phases:
       - yum -y install php-mbstring
       # This is a HACK of the PHP install for CodeDeploy is not a standard install for some reason
       # When yum installs the php-gmp it installs it not in the php install root
-      - PHP_INI_DIR="$(php -i | grep ^Scan | awk -F ' => ' '{print $2}')"
-      - mv /etc/php.d/20-gmp.ini $PHP_INI_DIR/
       - PHP_EXTENSION_DIR="$(php -i | grep ^extension_dir | awk -F ' => ' '{print $2}')"
       - mv /usr/lib64/php/modules/gmp.so $PHP_EXTENSION_DIR/
+      - PHP_INI_DIR="$(php -i | grep ^Scan | awk -F ' => ' '{print $2}')"
+      - mv /etc/php.d/20-gmp.ini $PHP_INI_DIR/
       # Install composer
       - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
       - php composer-setup.php

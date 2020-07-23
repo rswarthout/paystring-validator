@@ -1262,19 +1262,19 @@ class PayIDValidator {
 
         try {
             $payload = json_decode($verifiedAddress->payload);
-            $payidAddress = $payload->payid_address;
+            $payIdAddress = $payload->payIdAddress;
 
             if (!isset($payload->sub)) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
-                    $payidAddress->addressDetails->address,
+                    $payIdAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
                     'payload "sub" property missing'
                 );
             } elseif ($payload->sub != $payId) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
-                    $payidAddress->addressDetails->address,
+                    $payIdAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
                     'payload "sub" value ' . $payload->sub . ' does not match ' . $payId
                 );
@@ -1291,14 +1291,21 @@ class PayIDValidator {
                 if ($isVerified) {
                     $this->setResponseProperty(
                         'Verified address[' . $index . '] PayID signature[' . $i . '] verification',
-                        $payidAddress->addressDetails->address,
+                        $payIdAddress->addressDetails->address,
                         self::VALIDATION_CODE_PASS,
                         'Address has a valid signature.'
+                    );
+
+                    $this->validateXrpAddress(
+                        $index,
+                        $payIdAddress->paymentNetwork,
+                        $payIdAddress->environment,
+                        $payIdAddress->addressDetails->address
                     );
                 } else {
                     $this->setResponseProperty(
                         'Verified address[' . $index . '] PayID signature[' . $i . '] verification',
-                        $payidAddress->addressDetails->address,
+                        $payIdAddress->addressDetails->address,
                         self::VALIDATION_CODE_FAIL,
                         'Signature does not match address.'
                     );
@@ -1307,7 +1314,7 @@ class PayIDValidator {
         } catch (Exception $exception) {
             $this->setResponseProperty(
                 'Verified address[' . $index . '] PayID signature verification',
-                json_decode($verifiedAddress->payload)->payid_address->addressDetails->address,
+                json_decode($verifiedAddress->payload)->payIdAddress->addressDetails->address,
                 self::VALIDATION_CODE_FAIL,
                 'Invalid signature. Error: ' . $exception -> getMessage()
             );

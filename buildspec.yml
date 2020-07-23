@@ -13,14 +13,17 @@ phases:
       - PYTHON=python2 amazon-linux-extras enable php7.4
       - yum -y install php-gmp
       - yum -y install php-mbstring
-      - yum -y update
+      # This is a HACK of the PHP install for CodeDeploy is not a standard install for some reason
+      # When yum installs the php-gmp it installs it not in the php install root
+      - PHP_INI_DIR="$(php -i | grep ^Scan | awk -F ' => ' '{print $2}')"
+      - mv /etc/php.d/20-gmp.ini $PHP_INI_DIR/
+      - PHP_EXTENSION_DIR="$(php -i | grep ^extension_dir | awk -F ' => ' '{print $2}')"
+      - mv /usr/lib64/php/modules/gmp.so $PHP_EXTENSION_DIR/
       # Install composer
       - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
       - php composer-setup.php
       - php -r "unlink('composer-setup.php');"
       - mv composer.phar /usr/local/bin/composer
-      # Scan this dir for additional .ini files => /root/.phpenv/versions/7.4.7/etc/conf.d
-      - rpm -ql php-gmp
   build:
     commands:
       - sed -i "s/<% RELEASE_HASH %>/$CODEBUILD_RESOLVED_SOURCE_VERSION/g" dist/index.php

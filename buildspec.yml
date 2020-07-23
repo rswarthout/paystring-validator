@@ -19,9 +19,8 @@ phases:
       - php composer-setup.php
       - php -r "unlink('composer-setup.php');"
       - mv composer.phar /usr/local/bin/composer
-      - php -v
-      - php -m
-      - php -i
+      # Scan this dir for additional .ini files => /root/.phpenv/versions/7.4.7/etc/conf.d
+      - rpm -ql php-gmp
   build:
     commands:
       - sed -i "s/<% RELEASE_HASH %>/$CODEBUILD_RESOLVED_SOURCE_VERSION/g" dist/index.php

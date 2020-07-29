@@ -377,7 +377,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mt-0">
                     <p class="text-center text-base leading-6 text-gray-500">
-                        Licensed under MIT. Release <a href="https://github.com/rswarthout/payid-validator/commit/<% RELEASE_HASH %>" target="_blank" class="underline"><% RELEASE_HASH %></a>
+                        Licensed under MIT. Release <a href="https://github.com/rswarthout/payid-validator/commit/<% RELEASE_HASH %>" target="_blank" class="underline"><% RELEASE_HASH_SHORT %></a>
                     </p>
                 </div>
             </div>

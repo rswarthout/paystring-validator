@@ -27,6 +27,8 @@ phases:
   build:
     commands:
       - sed -i "s/<% RELEASE_HASH %>/$CODEBUILD_RESOLVED_SOURCE_VERSION/g" dist/index.php
+      - RELEASE_HASH_SHORT=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-6)
+      - sed -i "s/<% RELEASE_HASH_SHORT %>/$RELEASE_HASH_SHORT/g" dist/index.php
       # Have composer install the PHP dependencies
       - cd dist && composer install --no-progress --no-suggest && rm -f composer.* && cd -
       # Install dependencies

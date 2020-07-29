@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $payId = trim($_POST['pay-id']);
     $requestType = trim($_POST['request-type']);
+    $expectedResponseType = (int) trim($_POST['expected-response-type']);
 
     // Add context to the logging for further debugging
     $appLogger->pushProcessor(function ($record) use ($payId, $requestType) {
@@ -35,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $payIDValidator->setUserDefinedProperties(
         $payId,
-        $requestType
+        $requestType,
+        $expectedResponseType
     );
 
     if (!$payIDValidator->hasPreflightErrors()) {
@@ -155,6 +157,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <?php foreach ($payIdNetworkTypes as $id => $details) : ?>
                                                 <option value="<?php echo $id ?>" <?php echo (($payIDValidator->getNetworkType() === $id) ? 'selected="selected"' : '') ?>>
                                                     <?php echo $details['label']; ?> - <?php echo $details['header']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-6">
+                                        <label for="request-type" class="block text-sm font-medium leading-5 text-gray-700">
+                                            Expected Response
+                                        </label>
+                                        <select id="expected-response-type" name="expected-response-type" required class="block w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out">
+                                            <option value="">Choose an expected response</option>
+                                            <?php $responseTypes = $payIDValidator->getAllResponseExpectedTypes(); ?>
+                                            <?php foreach ($responseTypes as $id => $details) : ?>
+                                                <option value="<?php echo $id ?>" <?php echo (($payIDValidator->getExpectedResponseType() === $id) ? 'selected="selected"' : '') ?>>
+                                                    <?php echo $details['label']; ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>

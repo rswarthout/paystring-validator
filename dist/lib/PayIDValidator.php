@@ -33,6 +33,12 @@ class PayIDValidator {
     const NETWORK_XRP_DEVNET = 'xrpl-devnet';
 
     /**
+     * Supported response expected choices
+     */
+    const RESPONSE_200 = 200;
+    const RESPONSE_404 = 404;
+
+    /**
      * AddressDetailsType values
      */
     const ADDRESS_DETAILS_TYPE_ACH = 'AchAddressDetails';
@@ -111,11 +117,21 @@ class PayIDValidator {
         ],
     ];
 
+    private $responseExpectedTypes = [
+        self::RESPONSE_200 => [
+            'label' => 'HTTP 200 / OK',
+        ],
+        self::RESPONSE_404 => [
+            'label' => 'HTTP 404 / Not Found',
+        ],
+    ];
+
     /**
      * User provided values to complete a request
      */
     private $payId = '';
     private $networkType = '';
+    private $responseTypeExpected = '';
 
     /**
      * Property to toggle if validation has occurred
@@ -198,10 +214,12 @@ class PayIDValidator {
      */
     public function setUserDefinedProperties(
         string $payId,
-        string $networkType
+        string $networkType,
+        string $responseTypeExpected
     ) {
         $this->payId = $payId;
         $this->networkType = $networkType;
+        $this->responseTypeExpected = $responseTypeExpected;
     }
 
     /**
@@ -210,6 +228,14 @@ class PayIDValidator {
     public function getAllNetworkEnvironmentTypes(): array
     {
         return $this->networkTypes;
+    }
+
+    /**
+     * Returns an array of all response types supported
+     */
+    public function getAllResponseExpectedTypes(): array
+    {
+        return $this->responseExpectedTypes;
     }
 
     /**
@@ -237,6 +263,14 @@ class PayIDValidator {
     }
 
     /**
+     * Method to get the user defined expected response type
+     */
+    public function getExpectedResponseType(): int
+    {
+        return $this->responseTypeExpected;
+    }
+
+    /**
      * Method to return if the user defined PayID is of a valid format
      */
     public function isUserDefinedPayIdValid(): bool
@@ -260,7 +294,20 @@ class PayIDValidator {
     public function isUserDefinedNetworkSupported(): bool
     {
         if (!isset($this->networkTypes[$this->networkType])) {
-            $this->errors[] = 'The Request Type provided is not valid.';
+            $this->errors[] = 'The Network provided is not valid.';
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Method to check that the user defined response type is one that is supported
+     */
+    public function isUserDefinedExpectedResponseSupported(): bool
+    {
+        if (!isset($this->responseExpectedTypes[$this->responseTypeExpected])) {
+            $this->errors[] = 'The Expected Response type provided is not valid.';
             return false;
         }
 
@@ -274,6 +321,7 @@ class PayIDValidator {
     {
         $this->isUserDefinedPayIdValid();
         $this->isUserDefinedNetworkSupported();
+        $this->isUserDefinedExpectedResponseSupported();
 
         if (count($this->getErrors())) {
             return true;
@@ -351,18 +399,15 @@ class PayIDValidator {
      */
     private function checkStatusCode()
     {
-        $code = self::VALIDATION_CODE_FAIL;
-        $statusCode = $this->response->getStatusCode();
-
-        if ($statusCode === 200) {
+        if ($this->response->getStatusCode() === $this->getExpectedResponseType()) {
             $code = self::VALIDATION_CODE_PASS;
-        } elseif ($statusCode >= 300 && $statusCode < 400) {
-            $code = self::VALIDATION_CODE_WARN;
+        } else {
+            $code = self::VALIDATION_CODE_FAIL;
         }
 
         $this->setResponseProperty(
             'HTTP Status Code',
-            $statusCode,
+            $this->response->getStatusCode(),
             $code
         );
     }

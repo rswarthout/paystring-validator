@@ -131,7 +131,7 @@ class PayIDValidator {
      */
     private $payId = '';
     private $networkType = '';
-    private $responseTypeExpected = '';
+    private $responseTypeExpected = 0;
 
     /**
      * Property to toggle if validation has occurred

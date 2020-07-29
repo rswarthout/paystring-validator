@@ -55,7 +55,7 @@ class PayIDValidator {
      *
      * @var array
      */
-    private $requestTypes = [
+    private $networkTypes = [
         self::NETWORK_BTC_MAINNET => [
             'label' => 'BTC (mainnet)',
             'header' => 'application/btc-mainnet+json',
@@ -207,9 +207,9 @@ class PayIDValidator {
     /**
      * Returns an array of all request types that are defined
      */
-    public function getAllRequestTypes(): array
+    public function getAllNetworkEnvironmentTypes(): array
     {
-        return $this->requestTypes;
+        return $this->networkTypes;
     }
 
     /**
@@ -259,7 +259,7 @@ class PayIDValidator {
      */
     public function isUserDefinedNetworkSupported(): bool
     {
-        if (!isset($this->requestTypes[$this->networkType])) {
+        if (!isset($this->networkTypes[$this->networkType])) {
             $this->errors[] = 'The Request Type provided is not valid.';
             return false;
         }
@@ -310,7 +310,7 @@ class PayIDValidator {
                 [
                     'connect_timeout' => 5,
                     'headers' => [
-                        'Accept' => $this->requestTypes[$this->networkType]['header'],
+                        'Accept' => $this->networkTypes[$this->networkType]['header'],
                         'PayID-Version' => '1.0',
                         'User-Agent' => 'PayIDValidator.com / 0.1.0',
                     ],
@@ -543,7 +543,7 @@ class PayIDValidator {
             [
                 'connect_timeout' => 5,
                 'headers' => [
-                    'Accept' => $this->requestTypes[$this->networkType]['header'],
+                    'Accept' => $this->networkTypes[$this->networkType]['header'],
                     'PayID-Version' => '1.0',
                     'User-Agent' => 'PayIDValidator.com / 0.1.0',
                 ],
@@ -703,7 +703,7 @@ class PayIDValidator {
         $json = json_decode($body);
         $code = self::VALIDATION_CODE_FAIL;
         $msg = '';
-        $requestHeader = $this->requestTypes[$this->networkType]['header'];
+        $requestHeader = $this->networkTypes[$this->networkType]['header'];
 
         if ($json) {
 
@@ -910,7 +910,7 @@ class PayIDValidator {
         string $address
     ) {
         $hostname =
-            $this->requestTypes[strtolower($network . '-' . $environment)]['hostname'];
+            $this->networkTypes[strtolower($network . '-' . $environment)]['hostname'];
 
         $client = new GuzzleHttp\Client();
         $response = $client->request(
@@ -961,7 +961,7 @@ class PayIDValidator {
         string $address
     ) {
         $hostname =
-            $this->requestTypes[strtolower($network . '-' . $environment)]['hostname'];
+            $this->networkTypes[strtolower($network . '-' . $environment)]['hostname'];
 
         $client = new GuzzleHttp\Client();
         $response = $client->request(
@@ -1023,7 +1023,7 @@ class PayIDValidator {
         string $address
     ) {
         $hostname =
-            $this->requestTypes[strtolower($network . '-' . $environment)]['hostname'];
+            $this->networkTypes[strtolower($network . '-' . $environment)]['hostname'];
 
         // If we have an encoded address let's get the parts to get the underlying account address
         if (substr($address, 0, 1) === 'X') {

@@ -147,12 +147,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     <div class="mt-6">
                                         <label for="request-type" class="block text-sm font-medium leading-5 text-gray-700">
-                                            Request Type
+                                            Network (environment)
                                         </label>
                                         <select id="request-type" name="request-type" required class="block w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out">
-                                            <option value="">Choose request type</option>
-                                            <?php $payIdRequestTypes = $payIDValidator->getAllRequestTypes(); ?>
-                                            <?php foreach ($payIdRequestTypes as $id => $details) : ?>
+                                            <option value="">Choose a network type</option>
+                                            <?php $payIdNetworkTypes = $payIDValidator->getAllNetworkEnvironmentTypes(); ?>
+                                            <?php foreach ($payIdNetworkTypes as $id => $details) : ?>
                                                 <option value="<?php echo $id ?>" <?php echo (($payIDValidator->getNetworkType() === $id) ? 'selected="selected"' : '') ?>>
                                                     <?php echo $details['label']; ?> - <?php echo $details['header']; ?>
                                                 </option>
@@ -257,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 Header / Accept
                                             </dt>
                                             <dd class="mt-1 text-sm leading-5 text-gray-900">
-                                                <?php echo $payIdRequestTypes[$payIDValidator->getNetworkType()]['header']; ?>
+                                                <?php echo $payIdNetworkTypes[$payIDValidator->getNetworkType()]['header']; ?>
                                             </dd>
                                         </div>
                                         <div class="col-span-1">

@@ -28,6 +28,9 @@ class PayIDValidator {
     const NETWORK_ETH_KOVAN = 'eth-kovan';
     const NETWORK_ETH_RINKEBY = 'eth-rinkeby';
 
+    const NETWORK_ILP_MAINNET = 'ilp-mainnet';
+    const NETWORK_ILP_TESTNET = 'ilp-testnet';
+
     const NETWORK_XRP_MAINNET = 'xrpl-mainnet';
     const NETWORK_XRP_TESTNET = 'xrpl-testnet';
     const NETWORK_XRP_DEVNET = 'xrpl-devnet';
@@ -91,6 +94,14 @@ class PayIDValidator {
             'label' => 'ETH (rinkeby)',
             'header' => 'application/eth-rinkeby+json',
             'hostname' => 'https://api-rinkkeby.etherscan.io',
+        ],
+        self::NETWORK_ILP_MAINNET => [
+            'label' => 'ILP (mainnet)',
+            'header' => 'application/interledger-mainnet+json',
+        ],
+        self::NETWORK_ILP_TESTNET => [
+            'label' => 'ILP (testnet)',
+            'header' => 'application/interledger-testnet+json',
         ],
         self::NETWORK_XRP_MAINNET => [
             'label' => 'XRP (mainnet)',

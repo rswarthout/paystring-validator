@@ -772,7 +772,7 @@ class PayIDValidator {
             $environment = $headerPieces[2];
 
             if ($this->networkType !== self::NETWORK_ALL) {
-                if (isset($json->addresses)) {}
+                if (isset($json->addresses)) {
                     foreach ($json->addresses as $i => $address) {
                         if (strtolower($address->paymentNetwork) !== strtolower($network)) {
                             $errors[] = 'The paymentNetwork does not match with request header.';

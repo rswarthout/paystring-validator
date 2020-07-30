@@ -772,13 +772,15 @@ class PayIDValidator {
             $environment = $headerPieces[2];
 
             if ($this->networkType !== self::NETWORK_ALL) {
-                foreach ($json->addresses as $i => $address) {
-                    if (strtolower($address->paymentNetwork) !== strtolower($network)) {
-                        $errors[] = 'The paymentNetwork does not match with request header.';
-                    }
+                if (isset($json->addresses)) {}
+                    foreach ($json->addresses as $i => $address) {
+                        if (strtolower($address->paymentNetwork) !== strtolower($network)) {
+                            $errors[] = 'The paymentNetwork does not match with request header.';
+                        }
 
-                    if (isset($address->environment) && strtolower($address->environment) !== strtolower($environment)) {
-                        $errors[] = 'The environment does not match with request header.';
+                        if (isset($address->environment) && strtolower($address->environment) !== strtolower($environment)) {
+                            $errors[] = 'The environment does not match with request header.';
+                        }
                     }
                 }
             }
@@ -1307,6 +1309,17 @@ class PayIDValidator {
 
         try {
             $payload = json_decode($verifiedAddress->payload);
+
+            if (!isset($payload->payIdAddress)) {
+                $this->setResponseProperty(
+                    'Verified address[' . $index . '] PayID',
+                    '',
+                    self::VALIDATION_CODE_FAIL,
+                    'The "payIdAddress" property is missing.'
+                );
+                return;
+            }
+
             $payIdAddress = $payload->payIdAddress;
 
             if (!isset($payload->sub)) {
@@ -1314,14 +1327,15 @@ class PayIDValidator {
                     'Verified address[' . $index . '] PayID',
                     $payIdAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'payload "sub" property missing'
+                    'The payload "sub" property is missing.'
                 );
+                return;
             } elseif ($payload->sub != $payId) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
                     $payIdAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'payload "sub" value ' . $payload->sub . ' does not match ' . $payId
+                    'The payload "sub" value ' . $payload->sub . ' does not match ' . $payId . '.'
                 );
             }
 

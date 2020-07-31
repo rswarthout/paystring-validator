@@ -864,12 +864,17 @@ class PayIDValidator {
                     $validationErrors
                 );
 
-                $this->validateCryptoAddress(
-                    $index,
-                    $address->paymentNetwork,
-                    $address->environment,
-                    $address->addressDetails->address
-                );
+                if (isset($address->paymentNetwork) &&
+                    isset($address->environment) &&
+                    isset($address->addressDetails->address)
+                ) {
+                    $this->validateCryptoAddress(
+                        $index,
+                        $address->paymentNetwork,
+                        $address->environment,
+                        $address->addressDetails->address
+                    );
+                }
             }
         }
 

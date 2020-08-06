@@ -1326,7 +1326,7 @@ class PayIDValidator {
         try {
             $payload = json_decode($verifiedAddress->payload);
 
-            if (!isset($payload->payIdAddress)) {
+            if (!isset($payload->payIdAddress) && !isset($payload->payid_address)) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
                     '',
@@ -1336,7 +1336,11 @@ class PayIDValidator {
                 return;
             }
 
-            $payIdAddress = $payload->payIdAddress;
+            if (isset($payload->payIdAddress)) {
+                $payIdAddress = $payload->payIdAddress;
+            } else {
+                $payIdAddress = $payload->payid_address;
+            }
 
             if (!isset($payload->sub)) {
                 $this->setResponseProperty(

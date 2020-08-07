@@ -55,6 +55,11 @@ class PayIDValidator {
     const VALIDATION_CODE_FAIL = 'fail';
 
     /**
+     * The user agent sent with all requests
+     */
+    const USER_AGENT = 'PayIDValidator.com / 0.1.0';
+
+    /**
      * Regex pattern for a valid PayID
      */
     const PAYID_REGEX = '/^[a-z0-9!#@%&*+\=?^_`{|}~-]+(?:\.[a-z0-9!#@%&*+\=?^_`{|}~-]+)*\$(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z-]*[a-z0-9])?|(?:[0-9]{1,3}\.){3}[0-9]{1,3})$/';
@@ -371,7 +376,7 @@ class PayIDValidator {
                     'headers' => [
                         'Accept' => $this->networkTypes[$this->networkType]['header'],
                         'PayID-Version' => '1.0',
-                        'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                        'User-Agent' => self::USER_AGENT,
                     ],
                     'http_errors' => false,
                     'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
@@ -390,6 +395,7 @@ class PayIDValidator {
         }
 
         $this->checkStatusCode();
+        $this->checkAdminApiBlocked();
 
         if ($this->response->getStatusCode() === 200) {
             $this->checkCORSHeaders();
@@ -421,6 +427,78 @@ class PayIDValidator {
             $this->response->getStatusCode(),
             $code
         );
+    }
+
+    /**
+     * Method to do the check to see if the admin API is blocked/secured
+     */
+    private function checkAdminApiBlocked()
+    {
+        $payIdPieces = explode('$', $this->getPayId());
+        $aSuccess = false;
+
+        $hostnames = [
+            'https://' . $payIdPieces[1] . ':8081/users',
+        ];
+
+        foreach ($hostnames as $hostname) {
+            try {
+
+                $client = new GuzzleHttp\Client();
+                $response = $client->request(
+                    'POST',
+                    $hostname,
+                    [
+                        'connect_timeout' => 3,
+                        'headers' => [
+                            'Content-Type' => 'application/json',
+                            'PayID-Version' => '1.0',
+                            'User-Agent' => self::USER_AGENT,
+                        ],
+                        'http_errors' => false,
+                        'json' => [
+                            'payId' => 'alice$127.0.0.1',
+                            'addresses' => [
+                                [
+                                    'paymentNetwork' => 'XRPL',
+                                    'environment' => 'TESTNET',
+                                    'details' => [
+                                        'address' => 'rDk7FQvkQxQQNGTtfM2Fr66s7Nm3k87vdS',
+                                        'tag' => '123',
+                                    ]
+                                ],
+                            ],
+                        ],
+                        'timeout' => 5,
+                        'verify' => false,
+                        'version' => 2.0,
+                    ]
+                );
+
+                if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                    $aSuccess = true;
+
+                    $this->setResponseProperty(
+                        'Admin API Exposed Check',
+                        $hostname,
+                        self::VALIDATION_CODE_FAIL,
+                        'A POST request was made to this endpoint and a 200-level HTTP resoonse code was returned.'
+                    );
+                }
+
+            } catch (GuzzleHttp\Exception\ConnectException $exception) {
+                // This is a good sign, could not connect on the given hostname/port combination
+            }
+        }
+
+        if (!$aSuccess) {
+            $this->setResponseProperty(
+                'Admin API Exposed Check',
+                '',
+                self::VALIDATION_CODE_PASS,
+                'The admin API to create users was checked and not found to be publicly exposed.'
+            );
+        }
     }
 
     /**
@@ -601,7 +679,7 @@ class PayIDValidator {
                 'headers' => [
                     'Accept' => $this->networkTypes[$this->networkType]['header'],
                     'PayID-Version' => '1.0',
-                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                    'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
                 'timeout' => 10,
@@ -982,7 +1060,7 @@ class PayIDValidator {
             [
                 'connect_timeout' => 2,
                 'headers' => [
-                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                    'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
                 'query' => [
@@ -1034,7 +1112,7 @@ class PayIDValidator {
                 'connect_timeout' => 2,
                 'headers' => [
                     'Accept' => 'application/json',
-                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                    'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
                 'query' => [
@@ -1102,7 +1180,7 @@ class PayIDValidator {
                 'connect_timeout' => 2,
                 'headers' => [
                     'Accept' => 'application/json',
-                    'User-Agent' => 'PayIDValidator.com / 0.1.0',
+                    'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
                 'json' => [

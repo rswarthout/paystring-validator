@@ -910,6 +910,13 @@ class PayIDValidator {
             }
         }
 
+        if (isset($json->verifiedAddresses)) {
+            foreach ($json->verifiedAddresses as $i => $address) {
+                $validationErrors =
+                    $this->validateJsonVerifiedAddressObject($i, $address, $validationErrors);
+            }
+        }
+
         return $validationErrors;
     }
 
@@ -951,6 +958,44 @@ class PayIDValidator {
                         $address->paymentNetwork,
                         $address->environment,
                         $address->addressDetails->address
+                    );
+                }
+            }
+        }
+
+        return $validationErrors;
+    }
+
+    /**
+     * Method to validate the JSON Verified Address object from the response
+     */
+    private function validateJsonVerifiedAddressObject(
+        int $index,
+        stdClass $address,
+        array $validationErrors
+    ): array {
+
+        $validationErrors = $this->validateJsonSchema(
+            $address,
+            'verified-address.json',
+            $validationErrors
+        );
+
+        if (isset($address->payload)) {
+            $payload = json_decode($address->payload);
+
+            if ($payload) {
+                $validationErrors = $this->validateJsonSchema(
+                    $payload,
+                    'verified-address-payload.json',
+                    $validationErrors
+                );
+
+                if (isset($payload->payIdAddress)) {
+                    $validationErrors = $this->validateJsonSchema(
+                        $payload->payIdAddress,
+                        'address.json',
+                        $validationErrors
                     );
                 }
             }
@@ -1318,9 +1363,7 @@ class PayIDValidator {
      */
     protected function getJsonValidator(): JsonSchema\Validator
     {
-        if ($this->jsonValidator === null) {
-            $this->jsonValidator = new JsonSchema\Validator;
-        }
+        $this->jsonValidator = new JsonSchema\Validator;
 
         return $this->jsonValidator;
     }
@@ -1404,7 +1447,7 @@ class PayIDValidator {
         try {
             $payload = json_decode($verifiedAddress->payload);
 
-            if (!isset($payload->payIdAddress) && !isset($payload->payid_address)) {
+            if (!isset($payload->payIdAddress)) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
                     '',
@@ -1414,11 +1457,7 @@ class PayIDValidator {
                 return;
             }
 
-            if (isset($payload->payIdAddress)) {
-                $payIdAddress = $payload->payIdAddress;
-            } else {
-                $payIdAddress = $payload->payid_address;
-            }
+            $payIdAddress = $payload->payIdAddress;
 
             if (!isset($payload->sub)) {
                 $this->setResponseProperty(

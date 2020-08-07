@@ -1,14 +1,15 @@
 {
     "type": "object",
     "properties": {
-        "accountNumber": {
+        "sub": {
             "type": "string"
         },
-        "routingNumber": {
-            "type": "string"
+        "payIdAddress": {
+            "type": "object"
         }
     },
     "required": [
-        "accountNumber"
+        "sub",
+        "payIdAddress"
     ]
 }

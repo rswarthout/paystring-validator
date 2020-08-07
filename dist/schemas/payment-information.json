@@ -4,6 +4,9 @@
         "addresses": {
             "type": "array"
         },
+        "verifiedAddresses": {
+            "type": "array"
+        },
         "proofOfControlSignature": {
             "type": "string"
         },

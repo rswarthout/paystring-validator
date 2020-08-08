@@ -24,5 +24,20 @@
         "github-domains": [
             "github.com"
         ]
+    },
+    "require-dev": {
+        "smgladkovskiy/phpcs-git-pre-commit": "dev-master"
+    },
+    "scripts": {
+        "install-hooks": [
+            "cp ./vendor/smgladkovskiy/phpcs-git-pre-commit/src/pre-commit ../.git/hooks/pre-commit",
+            "chmod +x ../.git/hooks/pre-commit"
+        ],
+        "post-install-cmd": [
+            "@install-hooks"
+        ],
+        "post-update-cmd": [
+            "@install-hooks"
+        ]
     }
 }

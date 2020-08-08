@@ -387,7 +387,6 @@ class PayIDValidator {
                     'version' => 2.0,
                 ]
             );
-
         } catch (GuzzleHttp\Exception\ConnectException $exception) {
             $this->logger->critical($exception);
             $this->failError = $exception->getMessage();
@@ -443,7 +442,6 @@ class PayIDValidator {
 
         foreach ($hostnames as $hostname) {
             try {
-
                 $client = new GuzzleHttp\Client();
                 $response = $client->request(
                     'POST',
@@ -485,7 +483,6 @@ class PayIDValidator {
                         'A POST request was made to this endpoint and a 200-level HTTP resoonse code was returned.'
                     );
                 }
-
             } catch (GuzzleHttp\Exception\ConnectException $exception) {
                 // This is a good sign, could not connect on the given hostname/port combination
             }
@@ -538,7 +535,6 @@ class PayIDValidator {
                 'The header could not be located in the response.'
             );
         } else {
-
             $methods = [
                 'POST',
                 'GET',
@@ -597,7 +593,6 @@ class PayIDValidator {
                 'The header could not be located in the response.'
             );
         } else {
-
             $headerValue = $this->response->getHeaderLine('access-control-allow-headers');
             $pieces = explode(',', $headerValue);
             $pieces = array_map('trim', $pieces);
@@ -627,7 +622,6 @@ class PayIDValidator {
                 'The header could not be located in the response.'
             );
         } else {
-
             $headerValue = $this->response->getHeaderLine('access-control-expose-headers');
             $pieces = explode(',', $headerValue);
             $pieces = array_map('trim', $pieces);
@@ -750,9 +744,9 @@ class PayIDValidator {
 
         $headerValue = $this->response->getHeaderLine('content-type');
         preg_match(
-                '/application\/[\w\-]*[\+]*json/i',
-                $headerValue,
-                $headerPieces
+            '/application\/[\w\-]*[\+]*json/i',
+            $headerValue,
+            $headerPieces
         );
 
         if (count($headerPieces)) {
@@ -840,7 +834,6 @@ class PayIDValidator {
         $requestHeader = $this->networkTypes[$this->networkType]['header'];
 
         if ($json) {
-
             preg_match(
                 '/application\/([\w]+)[\-]*([^\+]+)?\+([\w]+)/',
                 $requestHeader,
@@ -1118,7 +1111,6 @@ class PayIDValidator {
         );
 
         if ($response->getStatusCode() === 200) {
-
             $body = $response->getBody();
 
             $this->setResponseProperty(
@@ -1478,7 +1470,7 @@ class PayIDValidator {
 
             $jws = $manager->unserialize(json_encode($verifiedAddress));
 
-            foreach($jws->getSignatures() as $i => $signature) {
+            foreach ($jws->getSignatures() as $i => $signature) {
                 // FIXME this assumes the JWK is included in the protected headers using `jwk` property
                 // be specified as a url via the `jku` property
                 $jwk = new JWK($signature->getProtectedHeader()["jwk"]);

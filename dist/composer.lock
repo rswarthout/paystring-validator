@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0e8cc2a6c5e77fd3d8baae02f2004cb",
+    "content-hash": "d767fe47da25ce5638b3d7a5774b9033",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1726,37 +1726,6 @@
     ],
     "packages-dev": [
         {
-            "name": "smgladkovskiy/phpcs-git-pre-commit",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/smgladkovskiy/phpcs-git-pre-commit.git",
-                "reference": "49375b9ff26b7a8fa16413eb3699bb0a3ad1bef2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/smgladkovskiy/phpcs-git-pre-commit/zipball/49375b9ff26b7a8fa16413eb3699bb0a3ad1bef2",
-                "reference": "49375b9ff26b7a8fa16413eb3699bb0a3ad1bef2",
-                "shasum": ""
-            },
-            "require": {
-                "squizlabs/php_codesniffer": "^2.7 || ^3.0"
-            },
-            "type": "scripts",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sergey Gladkovskiy",
-                    "email": "smgladkovskiy@gmail.com"
-                }
-            ],
-            "description": "PHPCS check before commit",
-            "time": "2020-06-17T03:44:14+00:00"
-        },
-        {
             "name": "squizlabs/php_codesniffer",
             "version": "3.5.5",
             "source": {
@@ -1810,9 +1779,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "smgladkovskiy/phpcs-git-pre-commit": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

@@ -26,11 +26,11 @@
         ]
     },
     "require-dev": {
-        "smgladkovskiy/phpcs-git-pre-commit": "dev-master"
+        "squizlabs/php_codesniffer": "3.*"
     },
     "scripts": {
         "install-hooks": [
-            "cp ./vendor/smgladkovskiy/phpcs-git-pre-commit/src/pre-commit ../.git/hooks/pre-commit",
+            "cp ../.githooks/pre-commit ../.git/hooks/pre-commit",
             "chmod +x ../.git/hooks/pre-commit"
         ],
         "post-install-cmd": [

@@ -1,5 +1,7 @@
 <?php
 
+namespace PayIDValidator;
+
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Serializer\JSONGeneralSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
@@ -11,7 +13,8 @@ use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Core\AlgorithmManager;
 
-class PayIDValidator {
+class Base
+{
 
     /**
      * Supported networks
@@ -173,14 +176,14 @@ class PayIDValidator {
     /**
      * Property to hold the JSON schema validator
      *
-     * @var JsonSchema\Validator
+     * @var \JsonSchema\Validator
      */
     private $jsonValidator;
 
     /**
      * Property to hold the logger
      *
-     * @var Monolog\Logger
+     * @var \Monolog\Logger
      */
     private $logger;
 
@@ -213,7 +216,7 @@ class PayIDValidator {
     /**
      * Property to hold the Guzzle response object
      *
-     * @var GuzzleHttp\Psr7\Response
+     * @var \GuzzleHttp\Psr7\Response
      */
     private $response;
 
@@ -294,7 +297,8 @@ class PayIDValidator {
         preg_match(
             self::PAYID_REGEX,
             $this->payId,
-            $matches);
+            $matches
+        );
 
         if (count($matches) !== 1) {
             $this->errors[] = 'The PayID you specified (' . $this->payId . ') is not a valid format for a PayID.';
@@ -366,8 +370,7 @@ class PayIDValidator {
         }
 
         try {
-
-            $client = new GuzzleHttp\Client();
+            $client = new \GuzzleHttp\Client();
             $this->response = $client->request(
                 'GET',
                 $this->getRequestUrl(),
@@ -381,13 +384,13 @@ class PayIDValidator {
                     'http_errors' => false,
                     'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
                         $this->checkResponseTime($stats->getTransferTime());
-                     },
+                    },
                     'timeout' => 10,
                     'verify' => false,
                     'version' => 2.0,
                 ]
             );
-        } catch (GuzzleHttp\Exception\ConnectException $exception) {
+        } catch (\GuzzleHttp\Exception\ConnectException $exception) {
             $this->logger->critical($exception);
             $this->failError = $exception->getMessage();
             return false;
@@ -442,7 +445,7 @@ class PayIDValidator {
 
         foreach ($hostnames as $hostname) {
             try {
-                $client = new GuzzleHttp\Client();
+                $client = new \GuzzleHttp\Client();
                 $response = $client->request(
                     'POST',
                     $hostname,
@@ -483,7 +486,7 @@ class PayIDValidator {
                         'A POST request was made to this endpoint and a 200-level HTTP resoonse code was returned.'
                     );
                 }
-            } catch (GuzzleHttp\Exception\ConnectException $exception) {
+            } catch (\GuzzleHttp\Exception\ConnectException $exception) {
                 // This is a good sign, could not connect on the given hostname/port combination
             }
         }
@@ -664,7 +667,7 @@ class PayIDValidator {
      */
     private function performSecondaryOptionsHeaderCheck(): bool
     {
-        $client = new GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'OPTIONS',
             $this->getRequestUrl(),
@@ -918,7 +921,7 @@ class PayIDValidator {
      */
     private function validateJsonAddressObject(
         int $index,
-        stdClass $address,
+        \stdClass $address,
         array $validationErrors
     ): array {
 
@@ -964,7 +967,7 @@ class PayIDValidator {
      */
     private function validateJsonVerifiedAddressObject(
         int $index,
-        stdClass $address,
+        \stdClass $address,
         array $validationErrors
     ): array {
 
@@ -1001,7 +1004,7 @@ class PayIDValidator {
      * Method to validate a given JSON schema against object
      */
     private function validateJsonSchema(
-        stdClass $object,
+        \stdClass $object,
         string $schemaFile,
         array $validationErrors
     ): array {
@@ -1091,7 +1094,7 @@ class PayIDValidator {
         $hostname =
             $this->networkTypes[strtolower($network . '-' . $environment)]['hostname'];
 
-        $client = new GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'GET',
             $hostname . '/q/addressbalance/' . $address,
@@ -1141,7 +1144,7 @@ class PayIDValidator {
         $hostname =
             $this->networkTypes[strtolower($network . '-' . $environment)]['hostname'];
 
-        $client = new GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'GET',
             $hostname . '/api',
@@ -1209,7 +1212,7 @@ class PayIDValidator {
             $address = $addressParts['account'];
         }
 
-        $client = new GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'POST',
             $hostname,
@@ -1260,7 +1263,7 @@ class PayIDValidator {
      */
     private function getDecodedXAddressParts($xAddress): array
     {
-        $client = new GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'GET',
             'https://xrpaddress.info/api/decode/' . $xAddress
@@ -1353,9 +1356,9 @@ class PayIDValidator {
     /**
      * Method to get the JSON validator
      */
-    protected function getJsonValidator(): JsonSchema\Validator
+    protected function getJsonValidator(): \JsonSchema\Validator
     {
-        $this->jsonValidator = new JsonSchema\Validator;
+        $this->jsonValidator = new \JsonSchema\Validator;
 
         return $this->jsonValidator;
     }
@@ -1363,7 +1366,7 @@ class PayIDValidator {
     /**
      * Method to set the logger
      */
-    public function setLogger(Monolog\Logger $logger)
+    public function setLogger(\Monolog\Logger $logger)
     {
         $this->logger = $logger;
     }

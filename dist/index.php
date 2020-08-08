@@ -15,13 +15,12 @@ ErrorHandler::register($phpLogger);
 $appLogger = new Logger('app');
 $appLogger->pushHandler(new ErrorLogHandler());
 
-$payIDValidator = new PayIDValidator(true);
+$payIDValidator = new PayIDValidator\Base(true);
 $payIDValidator->setLogger($appLogger);
 
 $success = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $payId = trim($_POST['pay-id']);
     $requestType = trim($_POST['request-type']);
     $expectedResponseType = (int) trim($_POST['expected-response-type']);
@@ -41,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if (!$payIDValidator->hasPreflightErrors()) {
-
         // This is hacky. The dev environment is not hosted on AWS.
         if (getenv('PAYID_ENVIRONMENT') === 'production') {
             $client = new SecretsManagerClient([
@@ -60,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'SecretId' => 'blockchain',
             ]);
             $payIDValidator->setBlockchainApiKey($result['SecretString']);
-
         } else {
             $payIDValidator->setEtherscanApiKey('YourApiKeyToken');
             $payIDValidator->setBlockchainApiKey('');
@@ -191,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <?php if ($success === false): ?>
+                    <?php if ($success === false) : ?>
                         <div class="flex flex-col justify-center">
                             <div class="w-full max-w-xl mx-auto">
                                 <div class="bg-red-300 shadow mt-10 px-10 py-8 rounded-lg">
@@ -331,15 +328,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     Result
                                                 </dt>
                                                 <dd class="mt-1 text-sm leading-5 text-gray-900">
-                                                    <?php if ($validation['code'] === PayIDValidator::VALIDATION_CODE_PASS) : ?>
+                                                    <?php if ($validation['code'] === \PayIDValidator\Base::VALIDATION_CODE_PASS) : ?>
                                                         <span class="px-3 inline-flex font-semibold rounded-full bg-green-800 text-green-100">
                                                             Pass
                                                         </span>
-                                                    <?php elseif ($validation['code'] === PayIDValidator::VALIDATION_CODE_WARN) : ?>
+                                                    <?php elseif ($validation['code'] === \PayIDValidator\Base::VALIDATION_CODE_WARN) : ?>
                                                         <span class="px-3 inline-flex font-semibold rounded-full bg-orange-800 text-orange-100">
                                                             Warn
                                                         </span>
-                                                    <?php elseif ($validation['code'] === PayIDValidator::VALIDATION_CODE_FAIL) : ?>
+                                                    <?php elseif ($validation['code'] === \PayIDValidator\Base::VALIDATION_CODE_FAIL) : ?>
                                                         <span class="px-3 inline-flex font-semibold rounded-full bg-red-800 text-red-100">
                                                             Fail
                                                         </span>
@@ -401,7 +398,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </footer>
 
-    <?php if ($payIDValidator->hasValidationOccurred()): ?>
+    <?php if ($payIDValidator->hasValidationOccurred()) : ?>
         <?php // This is the headers modal ?>
         <div id="modal-response-headers" class="modal fixed bottom-0 inset-x-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:items-center sm:justify-center" aria-hidden="true">
             <div class="fixed inset-0 transition-opacity">
@@ -435,13 +432,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </thead>
                                             <tbody>
                                                 <?php $i = 0; ?>
-                                                <?php foreach ($payIDValidator->getResponseHeaders() as $key => $value): ?>
+                                                <?php foreach ($payIDValidator->getResponseHeaders() as $key => $value) : ?>
                                                     <?php
-                                                        if (trim($key) == ''):
-                                                            continue;
-                                                        endif;
+                                                    if (trim($key) == '') :
+                                                        continue;
+                                                    endif;
 
-                                                        $i++
+                                                    $i++
                                                     ?>
                                                     <tr class="<?php echo (($i % 2) ? 'bg-white': 'bg-gray-100') ?>">
                                                         <td class="px-3 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">

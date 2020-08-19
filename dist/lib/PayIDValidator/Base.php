@@ -150,7 +150,7 @@ class Base
      */
     private $payId = '';
     private $networkType = '';
-    private $responseTypeExpected = 0;
+    private $responseTypeExpected = self::RESPONSE_200;
 
     /**
      * Property to toggle if validation has occurred

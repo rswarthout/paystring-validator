@@ -164,7 +164,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             Expected Response
                                         </label>
                                         <select id="expected-response-type" name="expected-response-type" required class="block w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out">
-                                            <option value="">Choose an expected response</option>
                                             <?php $responseTypes = $payIDValidator->getAllResponseExpectedTypes(); ?>
                                             <?php foreach ($responseTypes as $id => $details) : ?>
                                                 <option value="<?php echo $id ?>" <?php echo (($payIDValidator->getExpectedResponseType() === $id) ? 'selected="selected"' : '') ?>>

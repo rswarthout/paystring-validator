@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "ETH",
+    "environment": "MAINNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": ""
+    }
+}

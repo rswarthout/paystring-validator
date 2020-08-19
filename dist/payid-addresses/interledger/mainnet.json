@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "INTERLEDGER",
+    "environment": "MAINNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "$ilp.uphold.com/BrxjAwwRi27i"
+    }
+}

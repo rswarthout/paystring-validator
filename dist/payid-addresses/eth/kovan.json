@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "ETH",
+    "environment": "KOVAN",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "0x86fdA33A03C53D901D305E30a89d236F47FD1125"
+    }
+}

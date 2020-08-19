@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "INTERLEDGER",
+    "environment": "TESTNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "$xpring.money/rswarthout"
+    }
+}

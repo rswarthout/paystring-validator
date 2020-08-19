@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "XRPL",
+    "environment": "TESTNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "rfh536mXxmpQYT9AMDiGS2AUUyZuP1Ua8V"
+    }
+}

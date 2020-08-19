@@ -538,8 +538,7 @@ class Base
                 'The header could not be located in the response.'
             );
         } else {
-            $methods = [
-                'POST',
+            $allowedMethods = [
                 'GET',
                 'OPTIONS',
             ];
@@ -548,9 +547,9 @@ class Base
             $methodValues = explode(',', $headerValue);
             $methodValues = array_map('trim', $methodValues);
             $methodErrors = [];
-            $msg = '';
+            $msg = null;
 
-            foreach ($methods as $method) {
+            foreach ($allowedMethods as $method) {
                 if (!in_array($method, $methodValues)) {
                     $wasFound = false;
 
@@ -570,13 +569,29 @@ class Base
                 }
             }
 
+            $bannedMethods = [
+                'DELETE',
+                'PATCH',
+                'POST',
+                'PUT',
+            ];
+
+            foreach ($bannedMethods as $method) {
+                if (in_array($method, $methodValues)) {
+                    $methodErrors[] = 'Method [' . $method . '] is listed as supported and shouldn\'t be.';
+                }
+            }
+
             if (count($methodErrors)) {
+                if ($msg !== null) {
+                    $methodErrors[] = $msg;
+                }
+
                 $this->setResponseProperty(
                     'Header Check / Access-Control-Allow-Methods',
                     $headerValue,
                     self::VALIDATION_CODE_FAIL,
-                    implode(' ', $methodErrors),
-                    $msg
+                    $methodErrors
                 );
             } else {
                 $this->setResponseProperty(
@@ -1502,7 +1517,7 @@ class Base
                     );
                 }
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->setResponseProperty(
                 'Verified address[' . $index . '] PayID signature verification',
                 json_decode($verifiedAddress->payload)->payIdAddress->addressDetails->address,

@@ -349,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </dt>
                                                 <dd class="mt-1 text-sm leading-5 text-gray-900">
                                                     <?php if (is_array($validation['msg'])) : ?>
-                                                        <ul>
+                                                        <ul class="list-inside list-disc pl-3">
                                                             <?php foreach ($validation['msg'] as $msg) : ?>
                                                                 <li><?php echo $msg; ?></li>
                                                             <?php endforeach; ?>

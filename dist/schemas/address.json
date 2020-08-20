@@ -4,22 +4,22 @@
         "paymentNetwork": {
             "type": "string"
         },
-        "environment": { 
-            "type": "string" 
+        "environment": {
+            "type": "string"
         },
-        "addressDetailsType": { 
+        "addressDetailsType": {
             "type": "string",
             "enum": [
-                "CryptoAddressDetails", 
-                "AchAddressDetails"
-            ] 
+                "CryptoAddressDetails",
+                "FiatAddressDetails"
+            ]
         },
         "addressDetails": {
-            "type": "object" 
+            "type": "object"
         }
     },
     "required": [
-        "paymentNetwork", 
+        "paymentNetwork",
         "addressDetailsType",
         "addressDetails"
     ]

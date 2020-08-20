@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "XRPL",
+    "environment": "DEVNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "rNtmTEPcSj7WzVNAq41hCYHRCrTG7WpV7i"
+    }
+}

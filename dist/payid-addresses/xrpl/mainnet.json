@@ -1,0 +1,9 @@
+{
+    "paymentNetwork": "XRPL",
+    "environment": "MAINNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "rw2ciyaNshpHe7bCHo4bRWq6pqqynnWKQg",
+        "tag": "817575045"
+    }
+}

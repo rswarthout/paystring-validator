@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "BTC",
+    "environment": "MAINNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "12RAKUJJ9aLpSUqtZnHxGqTHG13VhcR3Le"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "BTC",
+    "environment": "TESTNET",
+    "addressDetailsType": "CryptoAddressDetails",
+    "addressDetails": {
+        "address": "1C6spGkQ8PCH813hQdbNTsaEpyVcF4XvuY"
+    }
+}

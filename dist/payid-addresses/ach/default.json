@@ -1,0 +1,8 @@
+{
+    "paymentNetwork": "ACH",
+    "addressDetailsType": "FiatAddressDetails",
+    "addressDetails": {
+        "accountNumber": "3216549870",
+        "routingNumber": "021000021"
+    }
+}

@@ -12,7 +12,7 @@ $phpLogger->pushHandler(new ErrorLogHandler());
 ErrorHandler::register($phpLogger);
 
 // Logging to be used wthin the app for debugging
-$appLogger = new Logger('app');
+$appLogger = new Logger('app-validate');
 $appLogger->pushHandler(new ErrorLogHandler());
 
 $payIDValidator = new PayIDValidator\Base(true);

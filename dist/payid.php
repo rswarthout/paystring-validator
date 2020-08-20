@@ -1,6 +1,9 @@
 <?php
 require 'vendor/autoload.php';
 
+use Monolog\Logger;
+use Monolog\Handler\ErrorLogHandler;
+
 $bitwise = (int) $_GET['bitwise'];
 $payIdAddress = $_GET['address-prefix'];
 
@@ -16,6 +19,12 @@ preg_match(
     $acceptHeaderValue,
     $headerPieces
 );
+
+$appLogger = new Logger('app-address');
+$appLogger->pushHandler(new ErrorLogHandler());
+$appLogger->info('payid address request; bitwise: ' . $bitwise, [
+    'content-type' => $acceptHeaderValue,
+]);
 
 // If we cannot parse the content-type requested we should just bail
 if (count($headerPieces) !== 2) {

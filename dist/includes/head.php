@@ -5,4 +5,5 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <title>PayID Validator</title>
     <meta name="monetization" content="$ilp.uphold.com/dB6fefJ7xJn3">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.6.0/dist/alpine.min.js" defer></script>
 </head>

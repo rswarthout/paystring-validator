@@ -18,6 +18,45 @@ class PayloadManager
     const BEST_PRACTICE_MISMATCHED_PAYID_ROOT = 256;
 
     /**
+     * List of options that are deemed incompatible issues
+     */
+    const INCOMPATIBLE_OPTIONS = [
+        self::INCOMPATIBLE_INVALID_CONTENT_TYPE_HEADER => [
+            'label' => 'Invalid Content-Type Header',
+        ],
+        self::INCOMPATIBLE_MISSING_CORS_HEADERS => [
+            'label' => 'Missing CORS Headers',
+        ],
+        self::INCOMPATIBLE_INVALID_CORS_HEADERS => [
+            'label' => 'Invalid CORS Headers',
+        ],
+        self::INCOMPATIBLE_INVALID_CACHE_CONTROL_HEADER => [
+            'label' => 'Invalid value for Cache-Control header',
+        ],
+        self::INCOMPATIBLE_MALFORMED_JSON_BODY => [
+            'label' => 'Malformed JSON body',
+        ],
+        self::INCOMPATIBLE_WRONG_NETWORK_PROPERTY => [
+            'label' => 'Wrong <span class="italic">paymentNetwork</span> value inside of address object',
+        ],
+        self::INCOMPATIBLE_MISSING_NETWORK_PROPERTY => [
+            'label' => 'Missing <span class="italic">paymentNetwork</span> property inside of address object',
+        ],
+    ];
+
+    /**
+     * List of options that are deemed as best practices
+     */
+    const BEST_PRACTICE_OPTIONS = [
+        self::BEST_PRACTICE_MISSING_PAYID_ROOT => [
+            'label' => 'Missing <span class="italic">payId</span> property in JSON root',
+        ],
+        self::BEST_PRACTICE_MISMATCHED_PAYID_ROOT => [
+            'label' => 'Mismatched <span class="italic">payId</span> property in JSON root',
+        ],
+    ];
+
+    /**
      * Property to hold the payload
      *
      * @var array
@@ -34,8 +73,10 @@ class PayloadManager
     /**
      * Public constructor
      */
-    public function __construct(array $payload, int $bitwiseSelection)
-    {
+    public function __construct(
+        array $payload,
+        int $bitwiseSelection
+    ) {
         $this->payload = $payload;
         $this->bitwiseSelection = $bitwiseSelection;
 

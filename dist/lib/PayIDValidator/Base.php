@@ -101,7 +101,7 @@ class Base
         self::NETWORK_ETH_RINKEBY => [
             'label' => 'ETH (rinkeby)',
             'header' => 'application/eth-rinkeby+json',
-            'hostname' => 'https://api-rinkkeby.etherscan.io',
+            'hostname' => 'https://api-rinkeby.etherscan.io',
         ],
         self::NETWORK_ILP_MAINNET => [
             'label' => 'ILP (mainnet)',

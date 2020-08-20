@@ -34,7 +34,7 @@ if (count($headerPieces) !== 2) {
 
 $headerSubPieces = explode('-', $headerPieces[1]);
 
-if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'all') {
+if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'payid') {
     $network = null;
     $environment = null;
 } else if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'ach') {

@@ -760,14 +760,9 @@ class Base
             return;
         }
 
-        $headerValue = $this->response->getHeaderLine('content-type');
-        preg_match(
-            '/application\/[\w\-]*[\+]*json/i',
-            $headerValue,
-            $headerPieces
-        );
+        $headerValue = trim($this->response->getHeaderLine('content-type'));
 
-        if (count($headerPieces)) {
+        if ($headerValue === 'application/json') {
             $this->setResponseProperty(
                 'Content Type',
                 $headerValue,
@@ -780,7 +775,7 @@ class Base
             'Content Type',
             ((strlen($headerValue)) ? $headerValue: ''),
             self::VALIDATION_CODE_FAIL,
-            'The value of [application/json] or other variants could not be found.'
+            'The value of [application/json].'
         );
     }
 

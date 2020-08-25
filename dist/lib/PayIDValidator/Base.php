@@ -780,7 +780,7 @@ class Base
             'Content Type',
             ((strlen($headerValue)) ? $headerValue: ''),
             self::VALIDATION_CODE_FAIL,
-            'The value of [application/json] or other variants could not be found.'
+            'The value of [application/json].'
         );
     }
 

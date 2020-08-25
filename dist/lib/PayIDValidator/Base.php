@@ -762,7 +762,7 @@ class Base
 
         $headerValue = $this->response->getHeaderLine('content-type');
         preg_match(
-            '/application\/[\w\-]*[\+]*json/i',
+            '/application\/json/i',
             $headerValue,
             $headerPieces
         );

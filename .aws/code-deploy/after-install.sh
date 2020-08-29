@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AWS_REGION="`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r`"
+AWS_REGION="`curl -s http://169.254.169.254/latest/meta-data/placement/region`"
 
 echo "AWS_REGION=${AWS_REGION}" >> /etc/environment
 echo "PAYID_ENVIRONMENT=production" >> /etc/environment

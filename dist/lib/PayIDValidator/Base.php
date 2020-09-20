@@ -1469,20 +1469,20 @@ class Base
 
             $payIdAddress = $payload->payIdAddress;
 
-            if (!isset($payload->sub)) {
+            if (!isset($payload->payId)) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
                     $payIdAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'The payload "sub" property is missing.'
+                    'The payload "payId" property is missing.'
                 );
                 return;
-            } elseif ($payload->sub != $payId) {
+            } elseif ($payload->payId != $payId) {
                 $this->setResponseProperty(
                     'Verified address[' . $index . '] PayID',
                     $payIdAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'The payload "sub" value ' . $payload->sub . ' does not match ' . $payId . '.'
+                    'The payload "payId" value ' . $payload->payId . ' does not match ' . $payId . '.'
                 );
             }
 

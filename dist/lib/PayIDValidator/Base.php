@@ -506,9 +506,27 @@ class Base
      */
     private function checkCORSHeaders()
     {
-        $headerValue = $this->response->getHeaderLine('access-control-allow-origin');
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request(
+            'OPTIONS',
+            $this->getRequestUrl(),
+            [
+                'connect_timeout' => 5,
+                'headers' => [
+                    'Accept' => $this->networkTypes[$this->networkType]['header'],
+                    'PayID-Version' => '1.0',
+                    'User-Agent' => self::USER_AGENT,
+                ],
+                'http_errors' => false,
+                'timeout' => 10,
+                'verify' => false,
+                'version' => 2.0,
+            ]
+        );
 
-        if (!$this->response->hasHeader('access-control-allow-origin')) {
+        $headerValue = $response->getHeaderLine('access-control-allow-origin');
+
+        if (!$response->hasHeader('access-control-allow-origin')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Origin',
                 '',
@@ -530,7 +548,7 @@ class Base
             );
         }
 
-        if (!$this->response->hasHeader('access-control-allow-methods')) {
+        if (!$response->hasHeader('access-control-allow-methods')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Methods',
                 '',
@@ -543,7 +561,7 @@ class Base
                 'OPTIONS',
             ];
 
-            $headerValue = $this->response->getHeaderLine('access-control-allow-methods');
+            $headerValue = $response->getHeaderLine('access-control-allow-methods');
             $methodValues = explode(',', $headerValue);
             $methodValues = array_map('trim', $methodValues);
             $methodErrors = [];
@@ -552,16 +570,6 @@ class Base
             foreach ($allowedMethods as $method) {
                 if (!in_array($method, $methodValues)) {
                     $wasFound = false;
-
-                    if ($method === 'OPTIONS') {
-                        // Some hosts only return OPTIONS value when
-                        // performing a pre-flight request with an OPTIONS request.
-                        $wasFound = $this->performSecondaryOptionsHeaderCheck();
-
-                        if ($wasFound) {
-                            $msg = 'Method [OPTIONS] was found via a secondary OPTIONS pre-flight request.';
-                        }
-                    }
 
                     if (!$wasFound) {
                         $methodErrors[] = 'Method [' . $method . '] not supported.';
@@ -603,7 +611,7 @@ class Base
             }
         }
 
-        if (!$this->response->hasHeader('access-control-allow-headers')) {
+        if (!$response->hasHeader('access-control-allow-headers')) {
             $this->setResponseProperty(
                 'Header Check / Access-Control-Allow-Headers',
                 '',
@@ -611,7 +619,7 @@ class Base
                 'The header could not be located in the response.'
             );
         } else {
-            $headerValue = $this->response->getHeaderLine('access-control-allow-headers');
+            $headerValue = $response->getHeaderLine('access-control-allow-headers');
             $pieces = explode(',', $headerValue);
             $pieces = array_map('trim', $pieces);
             $pieces = array_map('strtolower', $pieces);
@@ -673,42 +681,6 @@ class Base
                 );
             }
         }
-    }
-
-    /**
-     * Perform a secondary check for OPTIONS value for
-     * the Access-Control-Allow-Methods header. Return TRUE
-     * if found via OPTIONS request, false if not found.
-     */
-    private function performSecondaryOptionsHeaderCheck(): bool
-    {
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request(
-            'OPTIONS',
-            $this->getRequestUrl(),
-            [
-                'connect_timeout' => 5,
-                'headers' => [
-                    'Accept' => $this->networkTypes[$this->networkType]['header'],
-                    'PayID-Version' => '1.0',
-                    'User-Agent' => self::USER_AGENT,
-                ],
-                'http_errors' => false,
-                'timeout' => 10,
-                'verify' => false,
-                'version' => 2.0,
-            ]
-        );
-
-        if (!$response->hasHeader('access-control-allow-methods')) {
-            return false;
-        }
-
-        if (stripos($response->getHeaderLine('access-control-allow-methods'), 'OPTIONS') !== false) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

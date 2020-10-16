@@ -3,6 +3,10 @@ module.exports = {
         './dist/**/*.php',
         './dist/**/*.html',
     ],
+    future: {
+        defaultLineHeights: true,
+        standardFontWeights: true,
+    },
     target: 'relaxed',
     prefix: '',
     important: false,

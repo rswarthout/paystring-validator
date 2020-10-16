@@ -22,7 +22,7 @@
     "@sparkbox/cachebust": "^0.3.0",
     "@tailwindcss/ui": "^0.3.1",
     "autoprefixer": "^9.8.5",
-    "tailwindcss": "^1.5.2"
+    "tailwindcss": "^1.9.3"
   },
   "devDependencies": {},
   "cachebust": {

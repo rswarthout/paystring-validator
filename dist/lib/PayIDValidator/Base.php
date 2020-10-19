@@ -114,7 +114,7 @@ class Base
         self::NETWORK_XRP_MAINNET => [
             'label' => 'XRP (mainnet)',
             'header' => 'application/xrpl-mainnet+json',
-            'hostname' => 'https://s1.ripple.com:51234',
+            'hostname' => 'https://api.xrpscan.com',
         ],
         self::NETWORK_XRP_TESTNET => [
             'label' => 'XRP (testnet)',
@@ -1107,7 +1107,7 @@ class Base
                 'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_PASS,
-                "The address was validated with the network. Current balance: " . $body
+                "The address was validated with the network. Current balance: " . $body . "."
             );
         } else {
             $this->setResponseProperty(
@@ -1177,7 +1177,7 @@ class Base
             'Address[' . $index . '] ledger verification',
             $address,
             self::VALIDATION_CODE_PASS,
-            "The address was validated with the network. Current balance: " . $balance
+            "The address was validated with the network. Current balance: " . $balance . "."
         );
     }
 
@@ -1190,18 +1190,19 @@ class Base
         string $environment,
         string $address
     ) {
-        $hostname =
-            $this->networkTypes[strtolower($network . '-' . $environment)]['hostname'];
-
         // If we have an encoded address let's get the parts to get the underlying account address
         if (substr($address, 0, 1) === 'X') {
             $addressParts = $this->getDecodedXAddressParts($address);
             $address = $addressParts['account'];
         }
 
+        $hostname =
+            $this->networkTypes[strtolower($network . '-' . $environment)]['hostname']
+            . '/api/v1/account/' . $address;
+
         $client = new \GuzzleHttp\Client();
         $response = $client->request(
-            'POST',
+            'GET',
             $hostname,
             [
                 'connect_timeout' => 2,
@@ -1210,14 +1211,6 @@ class Base
                     'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
-                'json' => [
-                    'method' => 'account_info',
-                    'params' => [
-                        [
-                            'account' => $address,
-                        ]
-                    ]
-                ],
                 'timeout' => 5,
                 'verify' => false,
                 'version' => 2.0,
@@ -1233,14 +1226,26 @@ class Base
                 self::VALIDATION_CODE_FAIL,
                 'The network could not find the given address.'
             );
-        } elseif (isset($json->result->account_data)
-            && $json->result->account_data->Account === $address
-        ) {
+        } elseif (isset($json->account) && $json->account === $address) {
+            if (isset($json->accountName) && isset($json->accountName->name)) {
+                if (isset($json->accountName->twitter)) {
+                    $msg = " <a href=\"https://twitter.com/" . $json->accountName->twitter . "\" target=\"_blank\" class=\"inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium leading-5 bg-blue-100 text-blue-800\">";
+                    $msg .= $json->accountName->name;
+                    $msg .= "</a>";
+                } else {
+                    $msg = " <span class=\"inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium leading-5 bg-blue-100 text-blue-800\">";
+                    $msg .= $json->accountName->name;
+                    $msg .= "</span>";
+                }
+
+                $address .= $msg;
+            }
+
             $this->setResponseProperty(
                 'Address[' . $index . '] ledger verification',
                 $address,
                 self::VALIDATION_CODE_PASS,
-                "The address was validated with the network. Current balance: " . $json->result->account_data->Balance
+                "The address was validated with the network. Current balance: " . $json->xrpBalance . "."
             );
         }
     }

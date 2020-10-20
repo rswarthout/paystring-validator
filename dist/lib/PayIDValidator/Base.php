@@ -531,7 +531,7 @@ class Base
                 'Header Check / Access-Control-Allow-Origin',
                 '',
                 self::VALIDATION_CODE_FAIL,
-                'The header could not be located in the response.'
+                'The header could not be located in the response. <a href="javascript:;" data-micromodal-trigger="modal-cors-headers" class="text-gray-500 underline">Help</a>'
             );
         } elseif ($headerValue != '*') {
             $this->setResponseProperty(
@@ -553,7 +553,7 @@ class Base
                 'Header Check / Access-Control-Allow-Methods',
                 '',
                 self::VALIDATION_CODE_FAIL,
-                'The header could not be located in the response.'
+                'The header could not be located in the response. <a href="javascript:;" data-micromodal-trigger="modal-cors-headers" class="text-gray-500 underline">Help</a>'
             );
         } else {
             $allowedMethods = [
@@ -616,7 +616,7 @@ class Base
                 'Header Check / Access-Control-Allow-Headers',
                 '',
                 self::VALIDATION_CODE_FAIL,
-                'The header could not be located in the response.'
+                'The header could not be located in the response. <a href="javascript:;" data-micromodal-trigger="modal-cors-headers" class="text-gray-500 underline">Help</a>'
             );
         } else {
             $headerValue = $response->getHeaderLine('access-control-allow-headers');

@@ -356,6 +356,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include('./includes/footer.php'); ?>
 
     <?php if ($payIDValidator->hasValidationOccurred()) : ?>
+        <style type="text/css">
+            .modal {
+                display: none;
+            }
+
+            .modal.is-open {
+                display: flex;
+            }
+        </style>
+
         <?php // This is the headers modal ?>
         <div id="modal-response-headers" class="modal fixed bottom-0 inset-x-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:items-center sm:justify-center" aria-hidden="true">
             <div class="fixed inset-0 transition-opacity">
@@ -424,17 +434,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
+        <?php // This is the CORS headers modal ?>
+        <div id="modal-cors-headers" class="modal fixed bottom-0 inset-x-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:items-center sm:justify-center" aria-hidden="true">
+            <div class="fixed inset-0 transition-opacity">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <div class="relative bg-white rounded-lg px-4 pt-5 pb-4 overflow-hidden shadow-xl transform transition-all sm:max-w-4xl sm:w-full sm:p-6" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                <div>
+                    <h3 class="text-lg text-center leading-6 font-medium text-gray-900" id="modal-headline">
+                        CORS Headers Configuration
+                    </h3>
+                    <div class="mt-2">
+                        <p class="text-sm leading-5 text-gray-500">
+                            Apache config
+                        </p>
+                    </div>
+                    <div class="mt-2">
+                        <p class="text-xs leading-5 text-gray-500">
+                            <div class="flex flex-col">
+                                <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                    <div class="max-h-screen75 inline-block min-w-full overflow-x-hidden overflow-y-auto rounded-lg border-b bg-gray-300">
+<pre class="text-sm p-2">Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, OPTIONS"
+Header set Access-Control-Allow-Headers "PayID-Version"
+Header set Access-Control-Expose-Headers "PayID-Version,PayID-Server-Version"
+Header set Cache-Control "no-store"</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                    <div class="mt-2">
+                        <p class="text-sm leading-5 text-gray-500">
+                            Nginx config
+                        </p>
+                    </div>
+                    <div class="mt-2">
+                        <p class="leading-5 text-gray-500">
+                            <div class="flex flex-col">
+                                <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                    <div class="max-h-screen75 inline-block min-w-full overflow-x-hidden overflow-y-auto rounded-lg border-b bg-gray-300">
+<pre class="text-sm p-2">location / {
+    add_header 'Cache-Control' 'no-store';
+
+    if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'PayID-Version';
+        add_header 'Access-Control-Expose-Headers' 'PayID-Version,PayID-Server-Version';
+        return 204;
+    }
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6">
+                    <span class="flex w-full rounded-md shadow-sm">
+                        <button type="button" data-custom-close="modal-response-headers" data-micromodal-close class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            Close
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
         <script>MicroModal.init();</script>
-        <style type="text/css">
-            .modal {
-                display: none;
-            }
-
-            .modal.is-open {
-                display: flex;
-            }
-        </style>
     <?php endif; ?>
 
 </body>

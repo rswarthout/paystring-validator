@@ -20,10 +20,10 @@ $payIDValidator->setLogger($appLogger);
 
 $success = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $payId = trim($_POST['pay-id']);
-    $requestType = trim($_POST['request-type']);
-    $expectedResponseType = (int) trim($_POST['expected-response-type']);
+if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'validate') {
+    $payId = trim($_REQUEST['pay-id']);
+    $requestType = trim($_REQUEST['request-type']);
+    $expectedResponseType = (int) trim($_REQUEST['expected-response-type']);
 
     // Add context to the logging for further debugging
     $appLogger->pushProcessor(function ($record) use ($payId, $requestType) {
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="w-full max-w-md mx-auto mt-6">
                             <div class="py-6 px-4 shadow rounded-lg bg-white">
-                                <form method="post">
+                                <form method="get">
 
                                     <?php if (count($payIDValidator->getErrors())) : ?>
                                         <div class="rounded-md bg-red-100 p-4 mb-4">
@@ -163,6 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </button>
                                         </span>
                                     </div>
+
+                                    <input type="hidden" name="action" value="validate" />
 
                                 </form>
 

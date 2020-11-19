@@ -1,10 +1,5 @@
-@tailwind base;
+@import "tailwindcss/base";
 
-@tailwind components;
+@import "tailwindcss/components";
 
-@tailwind utilities;
-
-@-webkit-keyframes blink { 67% { opacity: 0 }}
-@-moz-keyframes blink {  67% { opacity: 0 }}
-@-o-keyframes blink {  67% { opacity: 0 }}
-@keyframes blink {  67% { opacity: 0 }}
+@import "tailwindcss/utilities";

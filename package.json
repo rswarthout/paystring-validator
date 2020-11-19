@@ -20,9 +20,13 @@
   "homepage": "https://github.com/rswarthout/payid-validator#readme",
   "dependencies": {
     "@sparkbox/cachebust": "^0.3.0",
+    "@tailwindcss/aspect-ratio": "^0.2.0",
+    "@tailwindcss/forms": "^0.2.1",
+    "@tailwindcss/typography": "^0.3.1",
     "@tailwindcss/ui": "^0.3.1",
-    "autoprefixer": "^9.8.5",
-    "tailwindcss": "^1.9.3"
+    "autoprefixer": "^10.0.2",
+    "postcss": "^8.1.8",
+    "tailwindcss": "^2.0.1"
   },
   "devDependencies": {},
   "cachebust": {

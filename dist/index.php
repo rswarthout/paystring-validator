@@ -225,7 +225,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'validate') {
                                     </p>
                                 </div>
                                 <div class="py-5 px-6">
-                                    <dl class="grid col-gap-4 row-gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
+                                    <dl class="grid gap-x-4 gap-y-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
                                         <div class="col-span-1">
                                             <dt class="text-sm leading-5 font-medium text-gray-500">
                                                 Request URL
@@ -272,7 +272,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'validate') {
                         </div>
 
                         <div class="bg-white px-6 py-5 mt-3 border-b border-gray-200 rounded-lg shadow">
-                            <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                            <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap">
                                 <div class="ml-4 mt-2">
                                     <h3 class="text-xl leading-6 font-medium text-gray-900">
                                         Validation Results
@@ -298,7 +298,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'validate') {
                                         </h3>
                                     </div>
                                     <div class="py-5 px-6">
-                                        <dl class="grid col-gap-4 row-gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                        <dl class="grid gap-x-4 gap-y-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                                             <div class="col-span-1">
                                                 <dt class="text-sm leading-5 font-medium text-gray-500">
                                                     Value
@@ -410,7 +410,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'validate') {
                                                     $i++
                                                     ?>
                                                     <tr class="<?php echo (($i % 2) ? 'bg-white': 'bg-gray-100') ?>">
-                                                        <td class="px-3 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                                        <td class="px-3 py-4 whitespace-nowrap text-sm leading-5 font-medium text-gray-900">
                                                             <?php echo htmlentities(trim($key)); ?>
                                                         </td>
                                                         <td class="px-3 py-4 text-sm leading-5 text-gray-500">

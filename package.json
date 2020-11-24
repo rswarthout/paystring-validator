@@ -1,7 +1,7 @@
 {
-  "name": "payid-validator",
+  "name": "paystring-validator",
   "version": "1.0.0",
-  "description": "A simple app that validates PayID requests.",
+  "description": "A simple app that validates PayString requests.",
   "main": "index.js",
   "scripts": {
     "build:css": "tailwind build src/assets/css/style.css -o dist/assets/css/style.css",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rswarthout/payid-validator.git"
+    "url": "git+https://github.com/rswarthout/paystring-validator.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rswarthout/payid-validator/issues"
+    "url": "https://github.com/rswarthout/paystring-validator/issues"
   },
-  "homepage": "https://github.com/rswarthout/payid-validator#readme",
+  "homepage": "https://github.com/rswarthout/paystring-validator#readme",
   "dependencies": {
     "@sparkbox/cachebust": "^0.3.0",
     "@tailwindcss/ui": "^0.3.1",

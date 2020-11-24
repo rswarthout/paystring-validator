@@ -1,6 +1,6 @@
 <?php
 
-namespace PayIDValidator;
+namespace PayStringValidator;
 
 class PayloadManager
 {
@@ -14,8 +14,8 @@ class PayloadManager
     const INCOMPATIBLE_MALFORMED_JSON_BODY = 16;
     const INCOMPATIBLE_WRONG_NETWORK_PROPERTY = 32;
     const INCOMPATIBLE_MISSING_NETWORK_PROPERTY = 64;
-    const BEST_PRACTICE_MISSING_PAYID_ROOT = 128;
-    const BEST_PRACTICE_MISMATCHED_PAYID_ROOT = 256;
+    const BEST_PRACTICE_MISSING_PAYSTRING_ROOT = 128;
+    const BEST_PRACTICE_MISMATCHED_PAYSTRING_ROOT = 256;
 
     /**
      * List of options that are deemed incompatible issues
@@ -48,11 +48,11 @@ class PayloadManager
      * List of options that are deemed as best practices
      */
     const BEST_PRACTICE_OPTIONS = [
-        self::BEST_PRACTICE_MISSING_PAYID_ROOT => [
-            'label' => 'Missing <span class="italic">payId</span> property in JSON root',
+        self::BEST_PRACTICE_MISSING_PAYSTRING_ROOT => [
+            'label' => 'Missing <span class="italic">payString</span> property in JSON root',
         ],
-        self::BEST_PRACTICE_MISMATCHED_PAYID_ROOT => [
-            'label' => 'Mismatched <span class="italic">payId</span> property in JSON root',
+        self::BEST_PRACTICE_MISMATCHED_PAYSTRING_ROOT => [
+            'label' => 'Mismatched <span class="italic">payString</span> property in JSON root',
         ],
     ];
 
@@ -99,15 +99,15 @@ class PayloadManager
         if ($this->bitwiseSelection & self::INCOMPATIBLE_MISSING_CORS_HEADERS) {
             // we are not setting the CORs headers if this bitwise bit is flipped
         } else if ($this->bitwiseSelection & self::INCOMPATIBLE_INVALID_CORS_HEADERS) {
-            header('Access-Control-Allow-Headers: PayID-Version-Bar');
+            header('Access-Control-Allow-Headers: PayString-Version-Bar');
             header('Access-Control-Allow-Methods: POST');
             header('Access-Control-Allow-Origin: foo.com');
-            header('Access-Control-Expose-Headers: PayID-Server-Version-Bar, PayID-Version-Bar');
+            header('Access-Control-Expose-Headers: PayString-Server-Version-Bar, PayString-Version-Bar');
         } else {
-            header('Access-Control-Allow-Headers: PayID-Version');
+            header('Access-Control-Allow-Headers: PayString-Version');
             header('Access-Control-Allow-Methods: GET, OPTIONS');
             header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Expose-Headers: PayID-Server-Version, PayID-Version');
+            header('Access-Control-Expose-Headers: PayString-Server-Version, PayString-Version');
         }
 
         if ($this->bitwiseSelection & self::INCOMPATIBLE_INVALID_CACHE_CONTROL_HEADER) {
@@ -125,11 +125,11 @@ class PayloadManager
     private function adjustJsonPayload()
     {
         // Should we remove the "payId" node from the root?
-        if ($this->bitwiseSelection & self::BEST_PRACTICE_MISSING_PAYID_ROOT) {
+        if ($this->bitwiseSelection & self::BEST_PRACTICE_MISSING_PAYSTRING_ROOT) {
             unset($this->payload['payId']);
-        } else if ($this->bitwiseSelection & self::BEST_PRACTICE_MISMATCHED_PAYID_ROOT) {
+        } else if ($this->bitwiseSelection & self::BEST_PRACTICE_MISMATCHED_PAYSTRING_ROOT) {
             // This is for a mismatched payId value
-            $this->payload['payId'] = 'mismatch$payidvalidator.com';
+            $this->payload['payId'] = 'mismatch$paystringvalidator.com';
         }
 
         // In this case we are changing to a wrong network type for all addresses

@@ -5,16 +5,16 @@
         }
     },
     "require": {
-        "aws/aws-sdk-php": "^3.145",
-        "guzzlehttp/guzzle": "^7.0",
+        "aws/aws-sdk-php": "^3.163",
+        "guzzlehttp/guzzle": "^7.2",
         "justinrainbow/json-schema": "^5.2",
         "monolog/monolog": "^2.1",
-        "web-token/jwt-easy": "^2.1",
-        "web-token/jwt-encryption-algorithm-rsa": "^2.1",
-        "web-token/jwt-signature": "^2.1",
-        "web-token/jwt-signature-algorithm-ecdsa": "^2.1",
-        "web-token/jwt-signature-algorithm-experimental": "^2.1",
-        "web-token/jwt-signature-algorithm-rsa": "^2.1"
+        "web-token/jwt-easy": "^2.2",
+        "web-token/jwt-encryption-algorithm-rsa": "^2.2",
+        "web-token/jwt-signature": "^2.2",
+        "web-token/jwt-signature-algorithm-ecdsa": "^2.2",
+        "web-token/jwt-signature-algorithm-experimental": "^2.2",
+        "web-token/jwt-signature-algorithm-rsa": "^2.2"
     },
     "config": {
         "vendor-dir": "vendor",
@@ -26,7 +26,7 @@
         ]
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "3.*"
+        "squizlabs/php_codesniffer": "^3.5"
     },
     "scripts": {
         "install-hooks": [

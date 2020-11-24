@@ -2,7 +2,7 @@ Options -MultiViews
 RewriteEngine On
 RewriteBase /
 
-RewriteRule ^(payid)$ payid.php?bitwise=0&address-prefix=$1 [L]
+RewriteRule ^(paystring)$ paystring.php?bitwise=0&address-prefix=$1 [L]
 
-RewriteCond %{REQUEST_URI} !^/payid\-generator\.php$
-RewriteRule ^(payid)-([\d]*) payid.php?address-prefix=$1&bitwise=$2 [L]
+RewriteCond %{REQUEST_URI} !^/paystring\-generator\.php$
+RewriteRule ^(paystring)-([\d]*) paystring.php?address-prefix=$1&bitwise=$2 [L]

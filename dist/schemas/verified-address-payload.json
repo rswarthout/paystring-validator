@@ -1,15 +1,15 @@
 {
     "type": "object",
     "properties": {
-        "payId": {
+        "payString": {
             "type": "string"
         },
-        "payIdAddress": {
+        "payStringAddress": {
             "type": "object"
         }
     },
     "required": [
-        "payId",
-        "payIdAddress"
+        "payString",
+        "payStringAddress"
     ]
 }

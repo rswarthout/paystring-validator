@@ -5,13 +5,13 @@ use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
 
 $bitwise = (int) $_GET['bitwise'];
-$payIdAddress = $_GET['address-prefix'];
+$payStringAddress = $_GET['address-prefix'];
 
 if ($bitwise > 0) {
-    $payIdAddress .= '-' . $bitwise;
+    $payStringAddress .= '-' . $bitwise;
 }
 
-$payIdAddress .= '$payidvalidator.com';
+$payStringAddress .= '$paystringvalidator.com';
 
 $acceptHeaderValue = strtolower($_SERVER['HTTP_ACCEPT']);
 preg_match(
@@ -22,7 +22,7 @@ preg_match(
 
 $appLogger = new Logger('app-address');
 $appLogger->pushHandler(new ErrorLogHandler());
-$appLogger->info('payid address request; bitwise: ' . $bitwise, [
+$appLogger->info('paystring address request; bitwise: ' . $bitwise, [
     'content-type' => $acceptHeaderValue,
 ]);
 
@@ -34,7 +34,7 @@ if (count($headerPieces) !== 2) {
 
 $headerSubPieces = explode('-', $headerPieces[1]);
 
-if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'payid') {
+if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'paystring') {
     $network = null;
     $environment = null;
 } else if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'ach') {
@@ -47,10 +47,10 @@ if (count($headerSubPieces) === 1 && $headerSubPieces[0] === 'payid') {
 
 // This is an ALL request
 if ($network === null) {
-    $files = glob('./payid-addresses/*/*.json');
+    $files = glob('./paystring-addresses/*/*.json');
 } else {
     // This is a request for specific network/environment combination
-    $path = realpath('./payid-addresses/' . $network . '/' . $environment . '.json');
+    $path = realpath('./paystring-addresses/' . $network . '/' . $environment . '.json');
 
     if (!$path) {
         http_response_code(404);
@@ -68,12 +68,12 @@ foreach ($files as $filepath) {
 }
 
 $payload = [
-    'payId' => $payIdAddress,
+    'payString' => $payStringAddress,
     'addresses' => $addresses,
 ];
 
 // Now, let's adjust this response for any chosen issues based upon the bitwise operator
-$payloadManager = new PayIDValidator\PayloadManager(
+$payloadManager = new PayStringValidator\PayloadManager(
     $payload,
     $bitwise
 );

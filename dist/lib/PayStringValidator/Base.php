@@ -1,6 +1,6 @@
 <?php
 
-namespace PayIDValidator;
+namespace PayStringValidator;
 
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Serializer\JSONGeneralSerializer;
@@ -60,10 +60,10 @@ class Base
     /**
      * The user agent sent with all requests
      */
-    const USER_AGENT = 'PayIDValidator.com / 0.1.0';
+    const USER_AGENT = 'PayStringValidator.com / 0.1.0';
 
     /**
-     * Regex pattern for a valid PayID
+     * Regex pattern for a valid PayString
      */
     const PAYID_REGEX = '/^[a-z0-9!#@%&*+\=?^_`{|}~-]+(?:\.[a-z0-9!#@%&*+\=?^_`{|}~-]+)*\$(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z-]*[a-z0-9])?|(?:[0-9]{1,3}\.){3}[0-9]{1,3})$/i';
 
@@ -148,7 +148,7 @@ class Base
     /**
      * User provided values to complete a request
      */
-    private $payId = '';
+    private $payString = '';
     private $networkType = '';
     private $responseTypeExpected = self::RESPONSE_200;
 
@@ -229,14 +229,14 @@ class Base
     }
 
     /**
-     *  Set's the user defined PayID and network type
+     *  Set's the user defined PayString and network type
      */
     public function setUserDefinedProperties(
-        string $payId,
+        string $payString,
         string $networkType,
         string $responseTypeExpected
     ) {
-        $this->payId = $payId;
+        $this->payString = $payString;
         $this->networkType = $networkType;
         $this->responseTypeExpected = $responseTypeExpected;
     }
@@ -266,11 +266,11 @@ class Base
     }
 
     /**
-     * Method to get the user defined PayID
+     * Method to get the user defined PayString
      */
-    public function getPayId(): string
+    public function getPayString(): string
     {
-        return $this->payId;
+        return $this->payString;
     }
 
     /**
@@ -290,18 +290,18 @@ class Base
     }
 
     /**
-     * Method to return if the user defined PayID is of a valid format
+     * Method to return if the user defined PayString is of a valid format
      */
     public function isUserDefinedPayIdValid(): bool
     {
         preg_match(
             self::PAYID_REGEX,
-            $this->payId,
+            $this->payString,
             $matches
         );
 
         if (count($matches) !== 1) {
-            $this->errors[] = 'The PayID you specified (' . $this->payId . ') is not a valid format for a PayID.';
+            $this->errors[] = 'The PayString you specified (' . $this->payString . ') is not a valid format for a PayString.';
             return false;
         }
 
@@ -335,7 +335,7 @@ class Base
     }
 
     /**
-     * Method to check for any preflight errors like an invalid PayID or request type
+     * Method to check for any preflight errors like an invalid PayString or request type
      */
     public function hasPreflightErrors(): bool
     {
@@ -355,13 +355,13 @@ class Base
      */
     public function getRequestUrl(): string
     {
-        $payIdPieces = explode('$', $this->getPayId());
+        $payStringPieces = explode('$', $this->getPayString());
 
-        return 'https://' . $payIdPieces[1] . '/' . $payIdPieces[0];
+        return 'https://' . $payStringPieces[1] . '/' . $payStringPieces[0];
     }
 
     /**
-     * Method to make the request to the PayID server
+     * Method to make the request to the PayString server
      */
     public function makeRequest(): bool
     {
@@ -378,7 +378,7 @@ class Base
                     'connect_timeout' => 5,
                     'headers' => [
                         'Accept' => $this->networkTypes[$this->networkType]['header'],
-                        'PayID-Version' => '1.0',
+                        'PayString-Version' => '1.0',
                         'User-Agent' => self::USER_AGENT,
                     ],
                     'http_errors' => false,
@@ -436,11 +436,11 @@ class Base
      */
     private function checkAdminApiBlocked()
     {
-        $payIdPieces = explode('$', $this->getPayId());
+        $payStringPieces = explode('$', $this->getPayString());
         $aSuccess = false;
 
         $hostnames = [
-            'https://' . $payIdPieces[1] . ':8081/users',
+            'https://' . $payStringPieces[1] . ':8081/users',
         ];
 
         foreach ($hostnames as $hostname) {
@@ -453,12 +453,12 @@ class Base
                         'connect_timeout' => 3,
                         'headers' => [
                             'Content-Type' => 'application/json',
-                            'PayID-Version' => '1.0',
+                            'PayString-Version' => '1.0',
                             'User-Agent' => self::USER_AGENT,
                         ],
                         'http_errors' => false,
                         'json' => [
-                            'payId' => 'alice$127.0.0.1',
+                            'payString' => 'alice$127.0.0.1',
                             'addresses' => [
                                 [
                                     'paymentNetwork' => 'XRPL',
@@ -514,7 +514,7 @@ class Base
                 'connect_timeout' => 5,
                 'headers' => [
                     'Accept' => $this->networkTypes[$this->networkType]['header'],
-                    'PayID-Version' => '1.0',
+                    'PayString-Version' => '1.0',
                     'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
@@ -629,7 +629,7 @@ class Base
                     'Header Check / Access-Control-Allow-Headers',
                     $headerValue,
                     self::VALIDATION_CODE_FAIL,
-                    'The [PayID-Version] header was not specified.'
+                    'The [PayString-Version] header was not specified.'
                 );
             } else {
                 $this->setResponseProperty(
@@ -654,8 +654,8 @@ class Base
             $pieces = array_map('strtolower', $pieces);
 
             $exposed = [
-                'PayID-Version',
-                'PayID-Server-Version',
+                'PayString-Version',
+                'PayString-Server-Version',
             ];
 
             $exposedErrors = [];
@@ -974,9 +974,9 @@ class Base
                     $validationErrors
                 );
 
-                if (isset($payload->payIdAddress)) {
+                if (isset($payload->payStringAddress)) {
                     $validationErrors = $this->validateJsonSchema(
-                        $payload->payIdAddress,
+                        $payload->payStringAddress,
                         'address.json',
                         $validationErrors
                     );
@@ -1027,7 +1027,7 @@ class Base
             if (isset($json->verifiedAddresses)) {
                 foreach ($json->verifiedAddresses as $i => $rawAddress) {
                     $this->verifySignedAddress(
-                        $json->payId,
+                        $json->payString,
                         $i,
                         $rawAddress
                     );
@@ -1416,7 +1416,7 @@ class Base
      * Method to validate a verifiedAddress signature
      */
     private function verifySignedAddress(
-        string $payId,
+        string $payString,
         int $index,
         object $verifiedAddress
     ) {
@@ -1434,32 +1434,32 @@ class Base
         try {
             $payload = json_decode($verifiedAddress->payload);
 
-            if (!isset($payload->payIdAddress)) {
+            if (!isset($payload->payStringAddress)) {
                 $this->setResponseProperty(
-                    'Verified address[' . $index . '] PayID',
+                    'Verified address[' . $index . '] PayString',
                     '',
                     self::VALIDATION_CODE_FAIL,
-                    'The "payIdAddress" property is missing.'
+                    'The "payStringAddress" property is missing.'
                 );
                 return;
             }
 
-            $payIdAddress = $payload->payIdAddress;
+            $payStringAddress = $payload->payStringAddress;
 
-            if (!isset($payload->payId)) {
+            if (!isset($payload->payString)) {
                 $this->setResponseProperty(
-                    'Verified address[' . $index . '] PayID',
-                    $payIdAddress->addressDetails->address,
+                    'Verified address[' . $index . '] PayString',
+                    $payStringAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'The payload "payId" property is missing.'
+                    'The payload "payString" property is missing.'
                 );
                 return;
-            } elseif ($payload->payId != $payId) {
+            } elseif ($payload->payString != $payString) {
                 $this->setResponseProperty(
-                    'Verified address[' . $index . '] PayID',
-                    $payIdAddress->addressDetails->address,
+                    'Verified address[' . $index . '] PayString',
+                    $payStringAddress->addressDetails->address,
                     self::VALIDATION_CODE_FAIL,
-                    'The payload "payId" value ' . $payload->payId . ' does not match ' . $payId . '.'
+                    'The payload "payString" value ' . $payload->payString . ' does not match ' . $payString . '.'
                 );
             }
 
@@ -1473,22 +1473,22 @@ class Base
 
                 if ($isVerified) {
                     $this->setResponseProperty(
-                        'Verified address[' . $index . '] PayID signature[' . $i . '] verification',
-                        $payIdAddress->addressDetails->address,
+                        'Verified address[' . $index . '] PayString signature[' . $i . '] verification',
+                        $payStringAddress->addressDetails->address,
                         self::VALIDATION_CODE_PASS,
                         'Address has a valid signature.'
                     );
 
                     $this->validateXrpAddress(
                         $index,
-                        $payIdAddress->paymentNetwork,
-                        $payIdAddress->environment,
-                        $payIdAddress->addressDetails->address
+                        $payStringAddress->paymentNetwork,
+                        $payStringAddress->environment,
+                        $payStringAddress->addressDetails->address
                     );
                 } else {
                     $this->setResponseProperty(
-                        'Verified address[' . $index . '] PayID signature[' . $i . '] verification',
-                        $payIdAddress->addressDetails->address,
+                        'Verified address[' . $index . '] PayString signature[' . $i . '] verification',
+                        $payStringAddress->addressDetails->address,
                         self::VALIDATION_CODE_FAIL,
                         'Signature does not match address.'
                     );
@@ -1496,8 +1496,8 @@ class Base
             }
         } catch (\Exception $exception) {
             $this->setResponseProperty(
-                'Verified address[' . $index . '] PayID signature verification',
-                json_decode($verifiedAddress->payload)->payIdAddress->addressDetails->address,
+                'Verified address[' . $index . '] PayString signature verification',
+                json_decode($verifiedAddress->payload)->payStringAddress->addressDetails->address,
                 self::VALIDATION_CODE_FAIL,
                 'Invalid signature. Error: ' . $exception -> getMessage()
             );

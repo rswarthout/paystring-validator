@@ -1,7 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 
-use PayIDValidator\PayloadManager;
+use PayStringValidator\PayloadManager;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,13 +23,13 @@ use PayIDValidator\PayloadManager;
                         class="flex flex-col justify-center">
                         <div>
                             <h2 class="mt-2 lg:mt-6 text-center text-3xl font-extrabold text-gray-900">
-                                Generate a PayID address with specific issues
+                                Generate a PayString address with specific issues
                             </h2>
                             <p class="text-center">Easily test different cases within your app</p>
                         </div>
 
                         <div
-                            id="payid-address"
+                            id="paystring-address"
                             x-text="address"
                             class="w-full text-center mx-auto mt-6 text-5xl">
                         </div>
@@ -133,7 +133,7 @@ use PayIDValidator\PayloadManager;
                                             type="buttom"
                                             @click="copyAddressToClipboard()"
                                             class="w-full flex justify-center py-2 px-4 border border-transparent text-m font-medium rounded-md text-white bg-gray-600 hover:bg-gray-500 focus:outline-none focus:border-gray-700 focus:shadow-outline-gray active:bg-gray-700 transition duration-150 ease-in-out">
-                                            Copy PayID Address
+                                            Copy PayString Address
                                         </button>
                                     </span>
                                 </div>
@@ -169,9 +169,9 @@ use PayIDValidator\PayloadManager;
                     }
 
                     if (bitwiseTotal === 0) {
-                        this.address = 'payid$payidvalidator.com';
+                        this.address = 'paystring$paystringvalidator.com';
                     } else {
-                        this.address = 'payid-' + bitwiseTotal + '$payidvalidator.com';
+                        this.address = 'paystring-' + bitwiseTotal + '$paystringvalidator.com';
                     }
                 }
             }

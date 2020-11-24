@@ -3,7 +3,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="flex-shrink-0 flex items-center text-2xl">
-                    <img class="inline h-8 mr-2" src="/assets/img/payid-logo.svg" alt="PayID Logo" /> Validator
+                    <img class="inline h-8 mr-2" src="/assets/img/paystring-logo.svg" alt="PayString Logo" /> Validator
                 </div>
                 <div class="-my-px ml-6 space-x-8 flex">
                     <?php
@@ -11,7 +11,7 @@
                         $inactiveClasses = 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out';
                     ?>
                     <?php
-                    if ($_SERVER['REQUEST_URI'] == '/payid-generator.php') :
+                    if ($_SERVER['REQUEST_URI'] == '/paystring-generator.php') :
                         $index = $inactiveClasses;
                         $generator = $activeClasses;
                     else :
@@ -22,8 +22,8 @@
                     <a href="/" class="<?php echo $index; ?>">
                         Validate
                     </a>
-                    <a href="/payid-generator.php" class="<?php echo $generator; ?>">
-                        PayID Generator
+                    <a href="/paystring-generator.php" class="<?php echo $generator; ?>">
+                        PayString Generator
                     </a>
                 </div>
             </div>

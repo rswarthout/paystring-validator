@@ -10,7 +10,7 @@
         "proofOfControlSignature": {
             "type": "string"
         },
-        "payString": {
+        "payId": {
             "type": "string"
         },
         "memo": {

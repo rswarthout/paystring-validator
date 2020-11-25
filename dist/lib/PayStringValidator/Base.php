@@ -378,7 +378,7 @@ class Base
                     'connect_timeout' => 5,
                     'headers' => [
                         'Accept' => $this->networkTypes[$this->networkType]['header'],
-                        'PayString-Version' => '1.0',
+                        'PayID-Version' => '1.0',
                         'User-Agent' => self::USER_AGENT,
                     ],
                     'http_errors' => false,
@@ -453,7 +453,7 @@ class Base
                         'connect_timeout' => 3,
                         'headers' => [
                             'Content-Type' => 'application/json',
-                            'PayString-Version' => '1.0',
+                            'PayID-Version' => '1.0',
                             'User-Agent' => self::USER_AGENT,
                         ],
                         'http_errors' => false,
@@ -514,7 +514,7 @@ class Base
                 'connect_timeout' => 5,
                 'headers' => [
                     'Accept' => $this->networkTypes[$this->networkType]['header'],
-                    'PayString-Version' => '1.0',
+                    'PayID-Version' => '1.0',
                     'User-Agent' => self::USER_AGENT,
                 ],
                 'http_errors' => false,
@@ -629,7 +629,7 @@ class Base
                     'Header Check / Access-Control-Allow-Headers',
                     $headerValue,
                     self::VALIDATION_CODE_FAIL,
-                    'The [PayString-Version] header was not specified.'
+                    'The [PayID-Version] header was not specified.'
                 );
             } else {
                 $this->setResponseProperty(
@@ -654,8 +654,8 @@ class Base
             $pieces = array_map('strtolower', $pieces);
 
             $exposed = [
-                'PayString-Version',
-                'PayString-Server-Version',
+                'PayID-Version',
+                'PayID-Server-Version',
             ];
 
             $exposedErrors = [];

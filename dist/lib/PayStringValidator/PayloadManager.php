@@ -49,10 +49,10 @@ class PayloadManager
      */
     const BEST_PRACTICE_OPTIONS = [
         self::BEST_PRACTICE_MISSING_PAYSTRING_ROOT => [
-            'label' => 'Missing <span class="italic">payString</span> property in JSON root',
+            'label' => 'Missing <span class="italic">payId</span> property in JSON root',
         ],
         self::BEST_PRACTICE_MISMATCHED_PAYSTRING_ROOT => [
-            'label' => 'Mismatched <span class="italic">payString</span> property in JSON root',
+            'label' => 'Mismatched <span class="italic">payId</span> property in JSON root',
         ],
     ];
 
@@ -99,15 +99,15 @@ class PayloadManager
         if ($this->bitwiseSelection & self::INCOMPATIBLE_MISSING_CORS_HEADERS) {
             // we are not setting the CORs headers if this bitwise bit is flipped
         } else if ($this->bitwiseSelection & self::INCOMPATIBLE_INVALID_CORS_HEADERS) {
-            header('Access-Control-Allow-Headers: PayString-Version-Bar');
+            header('Access-Control-Allow-Headers: PayID-Version-Bar');
             header('Access-Control-Allow-Methods: POST');
             header('Access-Control-Allow-Origin: foo.com');
-            header('Access-Control-Expose-Headers: PayString-Server-Version-Bar, PayString-Version-Bar');
+            header('Access-Control-Expose-Headers: PayID-Server-Version-Bar, PayID-Version-Bar');
         } else {
-            header('Access-Control-Allow-Headers: PayString-Version');
+            header('Access-Control-Allow-Headers: PayID-Version');
             header('Access-Control-Allow-Methods: GET, OPTIONS');
             header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Expose-Headers: PayString-Server-Version, PayString-Version');
+            header('Access-Control-Expose-Headers: PayID-Server-Version, PayID-Version');
         }
 
         if ($this->bitwiseSelection & self::INCOMPATIBLE_INVALID_CACHE_CONTROL_HEADER) {

@@ -31,7 +31,7 @@ use PayStringValidator\PayloadManager;
                         <div
                             id="paystring-address"
                             x-text="address"
-                            class="w-full text-center mx-auto mt-6 text-5xl">
+                            class="w-full text-center mx-auto mt-6 text-xl md:text-5xl">
                         </div>
 
                         <div class="w-full max-w-lg mx-auto mt-6">
@@ -133,7 +133,7 @@ use PayStringValidator\PayloadManager;
                                             type="buttom"
                                             @click="copyAddressToClipboard()"
                                             class="w-full flex justify-center py-2 px-4 border border-transparent text-m font-medium rounded-md text-white bg-gray-600 hover:bg-gray-500 focus:outline-none focus:border-gray-700 focus:shadow-outline-gray active:bg-gray-700 transition duration-150 ease-in-out">
-                                            Copy PayString Address
+                                            Copy PayString
                                         </button>
                                     </span>
                                 </div>

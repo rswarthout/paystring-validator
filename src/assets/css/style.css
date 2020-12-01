@@ -8,3 +8,15 @@
 @-moz-keyframes blink {  67% { opacity: 0 }}
 @-o-keyframes blink {  67% { opacity: 0 }}
 @keyframes blink {  67% { opacity: 0 }}
+
+.paystring-logo {
+    background-image: url(/assets/img/paystring-logo.svg);
+    background-size: 162px 32px;
+    width: 162px;
+}
+
+@media (max-width: 640px) {
+    .paystring-logo {
+        width: 36px;
+    }
+}

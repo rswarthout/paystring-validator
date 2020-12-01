@@ -1,13 +1,8 @@
-@tailwind base;
+@import "tailwindcss/base";
 
-@tailwind components;
+@import "tailwindcss/components";
 
-@tailwind utilities;
-
-@-webkit-keyframes blink { 67% { opacity: 0 }}
-@-moz-keyframes blink {  67% { opacity: 0 }}
-@-o-keyframes blink {  67% { opacity: 0 }}
-@keyframes blink {  67% { opacity: 0 }}
+@import "tailwindcss/utilities";
 
 .paystring-logo {
     background-image: url(/assets/img/paystring-logo.svg);

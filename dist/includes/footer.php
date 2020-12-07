@@ -28,7 +28,7 @@
                     </p>
                 </div>
                 <div class="flex justify-center">
-                    <span class="text-gray-500">Did this validator help you? Consider sending me a tip <a href="https://twitter.com/robertswarthout" target="_blank" class="underline">@robertswarthout</a>.</span>
+                    <span class="text-gray-500">&copy; <?php echo date('Y'); ?> <a href="https://robertswarthout.com" target="_blank" class="underline">Robert Swarthout</a>.</span>
                     <a href="https://twitter.com/robertswarthout" class="ml-6 text-gray-400 hover:text-gray-500">
                         <span class="sr-only">Twitter</span>
                         <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
